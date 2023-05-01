@@ -4,6 +4,7 @@ import com.threed.jpct.util.Light;
 public class Start {
     World world;
     Object3D[] box;
+    Object3D test;
 
     public static void main(String[] args) {
         new Start();
