@@ -17,11 +17,11 @@ public class Start {
         Light l = new Light(world);
         l.setPosition(new SimpleVector(50, 50, -5));
 
-        TextureManager.getInstance().addTexture("plane", new Texture("tp\\expo_steel.png"));
+        TextureManager.getInstance().addTexture("plane", new Texture("resources\\tp\\expo_steel.png"));
 
-        TextureManager.getInstance().addTexture("box", new Texture("tp\\expo_bamboo.png"));
+        TextureManager.getInstance().addTexture("box", new Texture("resources\\tp\\expo_bamboo.png"));
 
-        box = Loader.load3DS("C:\\Users\\Ahmed\\Documents\\Java Game Project\\Hide and SEECS\\untitled.3ds", 2f);
+        box = Loader.load3DS("resources\\scene\\untitled.3ds", 2f);
         int i = 0;
         for (Object3D object3d : box) {
             i = i + 1;
@@ -45,8 +45,6 @@ public class Start {
 
         while (!org.lwjgl.opengl.Display.isCloseRequested()) {
             buffer.clear(java.awt.Color.white);
-            i += 0.0001;
-            world.getCamera().rotateCameraX(i);
             world.renderScene(buffer);
             world.draw(buffer);
             buffer.update();
