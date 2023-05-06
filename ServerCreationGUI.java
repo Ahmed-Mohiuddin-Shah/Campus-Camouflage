@@ -79,8 +79,6 @@ public class ServerCreationGUI implements ActionListener {
                 }
 
                 frame.dispose();
-                
-                s.loop();
                 break;
             case "Cancel":
                 new Game();
