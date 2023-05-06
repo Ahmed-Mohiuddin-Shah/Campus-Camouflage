@@ -8,6 +8,9 @@ public class ServerCreationGUI implements ActionListener {
 
     private JButton createButton, cancelButton;
 
+    JTextField ip;
+    JTextField port;
+
     ServerCreationGUI() {
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
@@ -30,8 +33,9 @@ public class ServerCreationGUI implements ActionListener {
         JLabel l = new JLabel("IP Address", JLabel.CENTER);
         JLabel l2 = new JLabel("Port", JLabel.CENTER);
 
-        JTextField ip = new JTextField();
-        JTextField port = new JTextField();
+        ip = new JTextField();
+        port = new JTextField();
+
         ip.setFont(helloHeadline);
         ip.setForeground(Color.BLACK);
         port.setFont(helloHeadline);
@@ -61,25 +65,28 @@ public class ServerCreationGUI implements ActionListener {
 
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-        }
-        new Game();
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Create":
+                Server s = null;
+                if (ip.getText().equals("") && port.getText().equals("")) {
+                    s = new Server();
+                } else if (ip.getText().equals("") && !port.getText().equals("")) {
+                    s = new Server(port.getText());
+                } else {
+                    s = new Server(ip.getText(), port.getText());
+                }
+
                 frame.dispose();
+                
+                s.loop();
                 break;
             case "Cancel":
                 new Game();
                 frame.dispose();
                 break;
             default:
-        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+        }
     }
 }

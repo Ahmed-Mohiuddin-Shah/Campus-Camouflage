@@ -37,17 +37,17 @@ public class Game implements ActionListener {
         buttonPanel.add(settingsButton);
         buttonPanel.add(exitButton);
 
-        buttonPanel.setFont(helloHeadline);
-        buttonPanel.setFont(helloHeadline);
-        buttonPanel.setFont(helloHeadline);
-        buttonPanel.setFont(helloHeadline);
-
         JLabel l = new JLabel("Hide and SEECS", JLabel.CENTER);
         l.setFont(helloHeadline);
-        l.setForeground(Color.BLACK);
-        frame.add(l, BorderLayout.CENTER);
-        frame.setLayout(new BorderLayout(10, 10));
-        frame.add(buttonPanel, BorderLayout.SOUTH);
+        l.setBackground(Color.BLACK);
+        buttonPanel.setFont(helloHeadline);
+        buttonPanel.setFont(helloHeadline);
+        buttonPanel.setFont(helloHeadline);
+        buttonPanel.setFont(helloHeadline);
+        frame.setLayout(new GridLayout(2,1, 10, 10));
+        
+        frame.add(l);
+        frame.add(buttonPanel);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1280, 720);
