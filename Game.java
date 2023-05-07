@@ -44,8 +44,8 @@ public class Game implements ActionListener {
         buttonPanel.setFont(helloHeadline);
         buttonPanel.setFont(helloHeadline);
         buttonPanel.setFont(helloHeadline);
-        frame.setLayout(new GridLayout(2,1, 10, 10));
-        
+        frame.setLayout(new GridLayout(2, 1, 10, 10));
+
         frame.add(l);
         frame.add(buttonPanel);
 
@@ -67,8 +67,8 @@ public class Game implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Connect to Server":
-                new ClientConnectScreen();
                 frame.dispose();
+                new GameClient();
                 break;
             case "Create Server":
                 new ServerCreationGUI();
@@ -79,7 +79,7 @@ public class Game implements ActionListener {
                 // frame.dispose();
                 break;
             case "Exit":
-                frame.dispose();
+                System.exit(0);
                 break;
             default:
         }

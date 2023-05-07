@@ -1,5 +1,3 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
@@ -8,17 +6,11 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
 import java.util.Date;
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
-import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 public class Server implements  ActionListener, Runnable {
@@ -44,20 +36,17 @@ public class Server implements  ActionListener, Runnable {
             try {
                 ipAddress = InetAddress.getByName(ip);
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             try {
                 server = new ServerSocket(Integer.parseInt(port), 0, ipAddress);
             } catch (NumberFormatException | IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         } else {
             try {
                 server = new ServerSocket(Integer.parseInt(port));
             } catch (NumberFormatException | IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -87,7 +76,6 @@ public class Server implements  ActionListener, Runnable {
         thread.start();
 
         frame = new JFrame("Server Running");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JButton closeButton = new JButton("Close Server");
         closeButton.addActionListener(e -> {
             frame.dispose();
@@ -136,20 +124,42 @@ public class Server implements  ActionListener, Runnable {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
             System.out.println("New client connected");
-            textArea.append("\n" + "New client connected");
+            textArea.append("\n New client connected");
 
-            OutputStream output = null;
+            new ServerThread(socket).start();
+        }
+    }
+
+    class ServerThread extends Thread {
+        private Socket socket;
+
+        public ServerThread(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
             try {
-                output = socket.getOutputStream();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            PrintWriter writer = new PrintWriter(output, true);
+                InputStream input = socket.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
-            writer.println(new Date().toString());
+                OutputStream output = socket.getOutputStream();
+                PrintWriter writer = new PrintWriter(output, true);
+
+                String text;
+
+                do {
+                    text = reader.readLine();
+                    String reverseText = new StringBuilder(text).reverse().toString();
+                    writer.println("Server: " + reverseText);
+
+                } while (!text.equals("bye"));
+
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("Server exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
         }
     }
 
