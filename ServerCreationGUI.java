@@ -69,13 +69,12 @@ public class ServerCreationGUI implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Create":
-                Server s;
                 if (ip.getText().equals("") && port.getText().equals("")) {
-                    s = new Server();
+                    new Server();
                 } else if (ip.getText().equals("") && !port.getText().equals("")) {
-                    s = new Server(port.getText());
+                    new Server(port.getText());
                 } else {
-                    s = new Server(ip.getText(), port.getText());
+                    new Server(ip.getText(), port.getText());
                 }
                 frame.dispose();
                 break;
