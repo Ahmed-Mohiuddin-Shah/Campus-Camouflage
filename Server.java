@@ -1,8 +1,6 @@
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
 
@@ -12,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
-public class Server implements  ActionListener, Runnable {
+public class Server implements Runnable {
     private ServerSocket server;
 
     private JFrame frame;
@@ -49,7 +47,6 @@ public class Server implements  ActionListener, Runnable {
                 e.printStackTrace();
             }
         }
-
 
         System.out.println("Server is listening on port " + port);
 
@@ -106,11 +103,6 @@ public class Server implements  ActionListener, Runnable {
         public boolean getRunning() {
             return running;
         }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        
     }
 
     @Override
