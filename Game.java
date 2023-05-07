@@ -19,7 +19,7 @@ public class Game implements ActionListener {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         ge.registerFont(helloHeadline);
 
-        frame = new JFrame("Hide and SEECS");
+        frame = new JFrame("Campus Camouflage");
         JPanel buttonPanel = new JPanel(new GridLayout(4, 1));
 
         clientButton = new JButton("Connect to Server");
@@ -37,7 +37,7 @@ public class Game implements ActionListener {
         buttonPanel.add(settingsButton);
         buttonPanel.add(exitButton);
 
-        JLabel l = new JLabel("Hide and SEECS", JLabel.CENTER);
+        JLabel l = new JLabel("Campus Camouflage", JLabel.CENTER);
         l.setFont(helloHeadline);
         l.setBackground(Color.BLACK);
         buttonPanel.setFont(helloHeadline);
