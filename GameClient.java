@@ -4,6 +4,8 @@ import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import com.threed.jpct.util.KeyMapper;
+
 import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -57,6 +59,7 @@ public class GameClient extends JFrame implements KeyListener {
         gameWindow = new MainGamePanel();
         gameWindow.addKeyListener(this);
         add(gameWindow, BorderLayout.CENTER);
+        add(panel, BorderLayout.EAST);
 
     }
 

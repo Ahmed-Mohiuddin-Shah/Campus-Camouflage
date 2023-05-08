@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
@@ -27,7 +28,7 @@ import com.threed.jpct.util.KeyMapper;
 import com.threed.jpct.util.KeyState;
 import com.threed.jpct.util.Light;
 
-public class MainGamePanel extends JPanel implements Runnable, MouseMotionListener {
+public class MainGamePanel extends JPanel implements Runnable, MouseMotionListener, KeyListener {
     private static final long serialVersionUID = 1L;
 
     private String[] texturesJPG = { "dome", "grass", "monk", "wall" };
@@ -41,8 +42,6 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
     private static final float MAXSPEED = 4f;
 
     private float xAngle = 0;
-
-    private KeyMapper keyMapper = null;
     private Mouse mouse;
 
     private Graphics g;
@@ -65,6 +64,8 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
     private boolean right = false;
 
     private boolean gameLoop = true;
+
+    KeyMapper keyMapper;
 
     private boolean doLoop = true;
     private Camera cam;
@@ -133,6 +134,7 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
         setLayout(null);
 
         addMouseMotionListener(this);
+        keyMapper = new KeyMapper(this);
         Thread renderThread = new Thread(this);
         renderThread.start();
     }
@@ -152,18 +154,15 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
 
         long ticks = 0;
 
-        keyMapper = new KeyMapper(this);
-
         while (gameLoop) {
 
             mouseCube.clearTranslation();
             mouseCube.translate(getMouseWorldPosition());
 
             cam.setPositionToCenter(player);
+            cam.align(player);
 
-            // cam.align(player);
-            cam.moveCamera(Camera.CAMERA_MOVEOUT, 200);
-            cam.moveCamera(Camera.CAMERA_MOVEUP, 100);
+            moveCamera();
 
             buffer.clear(java.awt.Color.DARK_GRAY);
             world.renderScene(buffer);
@@ -269,7 +268,7 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
         int dx = e.getX() - mouseX;
         int dy = e.getY() - mouseY;
 
-        rotateCamera(dx, dy);
+        // rotateCamera(dx, dy);
         mouseX = e.getX();
         mouseY = e.getY();
 
@@ -329,6 +328,88 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
             }
         }
         return pos;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
+
+    public void sendKeyMapper(KeyMapper keyMapper) {
+        this.keyMapper = keyMapper;
+    }
+
+    public void moveCamera() {
+        KeyState ks = null;
+        while ((ks = keyMapper.poll()) != KeyState.NONE) {
+            if (ks.getKeyCode() == KeyEvent.VK_UP) {
+                up = ks.getState();
+            }
+            if (ks.getKeyCode() == KeyEvent.VK_DOWN) {
+                down = ks.getState();
+            }
+            if (ks.getKeyCode() == KeyEvent.VK_LEFT) {
+                left = ks.getState();
+            }
+            if (ks.getKeyCode() == KeyEvent.VK_RIGHT) {
+                right = ks.getState();
+            }
+
+            if (ks.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                gameLoop = false;
+            }
+        }
+
+        // move the cube
+        if (up) {
+            SimpleVector t = player.getZAxis();
+            t.scalarMul(SPEED);
+            moveRes.add(t);
+        }
+
+        if (down) {
+            SimpleVector t = player.getZAxis();
+            t.scalarMul(-SPEED);
+            moveRes.add(t);
+        }
+
+        if (left) {
+            player.rotateY((float) Math.toRadians(-1));
+        }
+
+        if (right) {
+            player.rotateY((float) Math.toRadians(1));
+        }
+
+        // avoid high speeds
+        if (moveRes.length() > MAXSPEED) {
+            moveRes.makeEqualLength(new SimpleVector(0, 0, MAXSPEED));
+        }
+
+        player.translate(0, -0.02f, 0);
+
+        moveRes = player.checkForCollisionEllipsoid(moveRes, ellipsoid, 8);
+        player.translate(moveRes);
+
+        // finally apply the gravity:
+        SimpleVector t = new SimpleVector(0, 1, 0);
+        t = player.checkForCollisionEllipsoid(t, ellipsoid, 1);
+        player.translate(t);
+
+        // damping
+        if (moveRes.length() > DAMPING) {
+            moveRes.makeEqualLength(new SimpleVector(0, 0, DAMPING));
+        } else {
+            moveRes = new SimpleVector(0, 0, 0);
+        }
     }
 
     // private void rotateCamera(int dx, int dy) {
