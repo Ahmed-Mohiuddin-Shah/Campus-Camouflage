@@ -31,7 +31,7 @@ import com.threed.jpct.util.Light;
 public class MainGamePanel extends JPanel implements Runnable, MouseMotionListener, KeyListener {
     private static final long serialVersionUID = 1L;
 
-    private String[] texturesJPG = { "dome", "grass", "monk", "wall" };
+    private String[] texturesJPG = { "dome", "grass", "monk", "wall", "bckdrp", "sky" };
 
     private String[] texturesPNG = { "cop", "banana", "frnchr" };
 
@@ -96,19 +96,7 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
 
         world.setAmbientLight(255, 255, 255);
 
-        TextureManager.getInstance().addTexture("boxt", new Texture(128, 128, Color.PINK));
-
-        box = Primitives.getBox(3f, 2f);
-
-        box.setTexture("boxt");
-        box.setTransparency(0);
-        box.setEnvmapped(Object3D.ENVMAP_ENABLED);
-        box.build();
-
-        world.addObject(box);
-
         world.getCamera().setPosition(50, -20, -5);
-        world.getCamera().lookAt(box.getTransformedCenter());
         buffer = new FrameBuffer(1280, 720, FrameBuffer.SAMPLINGMODE_NORMAL);
         buffer.enableRenderer(IRenderer.RENDERER_SOFTWARE);
 
@@ -146,6 +134,7 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
         cam = world.getCamera();
         cam.moveCamera(Camera.CAMERA_MOVEOUT, 100);
         cam.lookAt(player.getTransformedCenter());
+        cam.setClippingPlanes(0.5f, 100000);
 
         long start = System.currentTimeMillis();
         long fps = 0;
@@ -197,6 +186,10 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
 
         map = Loader.load3DS("resources\\testMap.3ds", 1f);
 
+        Light light = new Light(world);
+        light.setIntensity(140, 120, 120);
+        light.setAttenuation(-1);
+
         for (Object3D object3d : map) {
 
             object3d.setCenter(SimpleVector.ORIGIN);
@@ -205,6 +198,9 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
             object3d.setRotationMatrix(new Matrix());
             if (object3d.getName().contains("Player")) {
                 player = object3d;
+            } else if (object3d.getName().contains("light")) {
+
+                light.setPosition(object3d.getTransformedCenter());
             } else {
                 object3d.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
                 world.addObject(object3d);
@@ -218,11 +214,6 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
 
         world.addObject(player);
         world.addObject(mouseCube);
-
-        Light light = new Light(world);
-        light.setPosition(new SimpleVector(0, -80, 0));
-        light.setIntensity(140, 120, 120);
-        light.setAttenuation(-1);
 
         world.setAmbientLight(20, 20, 20);
 
@@ -336,7 +327,7 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
 
     @Override
     public void keyPressed(KeyEvent e) {
-        
+
     }
 
     @Override
@@ -412,25 +403,4 @@ public class MainGamePanel extends JPanel implements Runnable, MouseMotionListen
         }
     }
 
-    // private void rotateCamera(int dx, int dy) {
-
-    // float MOUSE_SENSITIVITY = 1;
-    // // Calculate the rotation angles based on the mouse movement
-    // float yaw = dx * MOUSE_SENSITIVITY;
-    // float pitch = -dy * MOUSE_SENSITIVITY;
-
-    // // Create quaternions for the rotation angles
-    // Quaternion yawQuat = new Quaternion();
-    // ((Object) yawQuat).fromAxisAngle(new SimpleVector(0, 1, 0), yaw);
-    // Quaternion pitchQuat = new Quaternion();
-    // ((Object) pitchQuat).fromAxisAngle(new SimpleVector(1, 0, 0), pitch);
-
-    // // Multiply the quaternions by the current orientation of the camera
-    // Quaternion orientation = cam.getOrientation();
-    // orientation = ((Object) yawQuat).multiply(orientation);
-    // orientation = ((Object) orientation).multiply(pitchQuat);
-
-    // // Set the new orientation of the cam
-    // cam.setOrientation(orientation);
-    // }
 }
