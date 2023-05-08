@@ -1,48 +1,92 @@
-import java.net.*;
-import java.io.*;
+import java.awt.EventQueue;
+import java.awt.GridLayout;
 
-/**
- * This program demonstrates a simple TCP/IP socket client that reads input
- * from the user and prints echoed message from the server.
- *
- * @author www.codejava.net
- */
-public class GameClient {
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-    GameClient() {
-        int port = 6000;
+import javax.swing.JButton;
+import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.ActionEvent;
 
-        try (Socket socket = new Socket("26.194.89.19", port)) {
+public class GameClient extends JFrame implements KeyListener {
+    private JPanel panel;
+    static GameClient frame;
+    static MainGamePanel gameWindow;
 
-            OutputStream output = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(output, true);
+    public GameClient() throws Exception {
+        panel = new JPanel();
 
-            Console console = System.console();
-            String text;
+        setLayout(new BorderLayout(5, 5));
+        setSize(1280, 720);
+        setResizable(false);
 
-            do {
-                text = console.readLine("Enter text: ");
+        JButton btnTest = new JButton("Left");
+        btnTest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                panel.setVisible(false);
+            }
+        });
 
-                writer.println(text);
+        JButton btnRight = new JButton("Right");
+        btnRight.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                repaint();
+            }
+        });
 
-                InputStream input = socket.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        JButton btnClose = new JButton("Close");
+        btnClose.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                gameWindow.stop();
+                frame.dispose();
+                new Game();
+            }
+        });
 
-                String time = reader.readLine();
+        panel.setLayout(new GridLayout(3, 1));
+        panel.add(btnTest);
+        panel.add(btnRight);
+        panel.add(btnClose);
+        panel.addKeyListener(this);
 
-                System.out.println(time);
+        add(panel, BorderLayout.WEST);
 
-            } while (!text.equals("bye"));
+        gameWindow = new MainGamePanel();
+        gameWindow.addKeyListener(this);
+        add(gameWindow, BorderLayout.CENTER);
 
-            socket.close();
+    }
 
-        } catch (UnknownHostException ex) {
+    public static void makeFrame() {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    frame = new GameClient();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
-            System.out.println("Server not found: " + ex.getMessage());
-
-        } catch (IOException ex) {
-
-            System.out.println("I/O error: " + ex.getMessage());
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (e.getKeyChar() == 'p') {
+            panel.setVisible(panel.isVisible() ? false : true);
+            System.out.println("Hello");
         }
     }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
+
 }

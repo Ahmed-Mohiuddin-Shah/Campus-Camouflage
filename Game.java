@@ -67,8 +67,11 @@ public class Game implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Connect to Server":
+                try {
+                    GameClient.makeFrame();
+                } catch (Exception e1) {
+                }
                 frame.dispose();
-                new GameClient();
                 break;
             case "Create Server":
                 new ServerCreationGUI();
