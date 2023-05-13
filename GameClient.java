@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
 public class GameClient extends JFrame implements KeyListener {
     private JPanel panel;
     static GameClient frame;
-    static MainGamePanel gameWindow;
+    static RenderPanel gameWindow;
 
     public GameClient() throws Exception {
         panel = new JPanel();
@@ -40,7 +40,7 @@ public class GameClient extends JFrame implements KeyListener {
         JButton btnClose = new JButton("Close");
         btnClose.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                gameWindow.stop();
+                gameWindow.gameLoop = false;
                 frame.dispose();
                 new Game();
             }
@@ -54,7 +54,7 @@ public class GameClient extends JFrame implements KeyListener {
 
         add(panel, BorderLayout.WEST);
 
-        gameWindow = new MainGamePanel();
+        gameWindow = new RenderPanel();
         gameWindow.addKeyListener(this);
         add(gameWindow, BorderLayout.CENTER);
         add(panel, BorderLayout.EAST);
