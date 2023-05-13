@@ -11,7 +11,7 @@ public class Game implements ActionListener {
     Game() {
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
-            helloHeadline = Font.createFont(Font.TRUETYPE_FONT, new File("resources/HelloHeadline.ttf"))
+            helloHeadline = Font.createFont(Font.TRUETYPE_FONT, new File("resources/HelloHeadline.ttf"))                                                                    
                     .deriveFont(36f);
         } catch (Exception e) {
         }
