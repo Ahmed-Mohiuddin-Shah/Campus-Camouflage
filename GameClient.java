@@ -81,6 +81,7 @@ public class GameClient extends JFrame implements KeyListener {
         if (e.getKeyChar() == 'p') {
             panel.setVisible(panel.isVisible() ? false : true);
             System.out.println("Hello");
+
         }
     }
 
