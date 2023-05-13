@@ -32,7 +32,7 @@ import com.threed.jpct.util.KeyMapper;
 import com.threed.jpct.util.KeyState;
 import com.threed.jpct.util.Light;
 
-public class MainGamePanel extends Canvas
+public class TEMP extends Canvas
         implements Runnable, MouseMotionListener, KeyListener, ComponentListener, IPaintListener {
     private static final long serialVersionUID = 1L;
 
@@ -87,7 +87,7 @@ public class MainGamePanel extends Canvas
     Object3D box;
     Object3D plane, plane1;
 
-    public MainGamePanel() {
+    public TEMP() {
         addComponentListener(this);
         mouseX = 0;
         mouseY = 0;

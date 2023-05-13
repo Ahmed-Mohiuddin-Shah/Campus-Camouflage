@@ -1,10 +1,10 @@
 import java.awt.EventQueue;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import com.threed.jpct.util.KeyMapper;
 
 import javax.swing.JButton;
 import java.awt.BorderLayout;
@@ -20,10 +20,8 @@ public class GameClient extends JFrame implements KeyListener {
 
     public GameClient() throws Exception {
         panel = new JPanel();
-
-        setLayout(new BorderLayout(5, 5));
-        setSize(1280, 720);
-        setResizable(false);
+        setSize(1920, 1080);
+        
 
         JButton btnTest = new JButton("Left");
         btnTest.addActionListener(new ActionListener() {
@@ -69,6 +67,19 @@ public class GameClient extends JFrame implements KeyListener {
                 try {
                     frame = new GameClient();
                     frame.setVisible(true);
+                    frame.setUndecorated(true);
+
+                    // Get the default graphics device
+                    GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+                    // Enter full-screen mode
+                    device.setFullScreenWindow(frame);
+
+                    // Exit full-screen mode
+                    // device.setFullScreenWindow(null);
+
+                    // Set the size of the frame to match the screen size
+                    frame.setSize(1920, 1080);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
