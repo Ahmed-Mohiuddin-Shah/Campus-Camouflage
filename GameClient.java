@@ -9,11 +9,13 @@ import java.io.File;
 
 public class GameClient {
     private JPanel panel;
-    private JFrame frame;
+    private JFrame pauseFrame, gameFrame;
     FrameBuffer buffer;
     GraphicsDevice device;
+    Canvas canvas;
 
     public GameClient() {
+
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
             helloHeadline = Font.createFont(Font.TRUETYPE_FONT, new File("resources/HelloHeadline.ttf"))
@@ -24,23 +26,35 @@ public class GameClient {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         ge.registerFont(helloHeadline);
 
-        frame = new JFrame("Campus Camouflage");
+        pauseFrame = new JFrame("Campus Camouflage");
 
-        frame.setUndecorated(true);
-        frame.setResizable(false);
+        pauseFrame.setUndecorated(true);
+        pauseFrame.setResizable(false);
 
         device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        pauseFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        pauseFrame.setVisible(true);
 
         // // Enter full-screen mode
         // device.setFullScreenWindow(frame);
-        frame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
+        pauseFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
+
+        gameFrame = new JFrame("Campus Camouflage");
+
+        gameFrame.setUndecorated(true);
+        gameFrame.setResizable(false);
+
+        device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+        gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameFrame.setVisible(true);
+
+        // // Enter full-screen mode
+        device.setFullScreenWindow(gameFrame);
+        gameFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
         int maxWidth = 800;
         int maxHeight = 600;
         for (VideoMode vMode : FrameBuffer.getVideoModes(IRenderer.RENDERER_OPENGL)) {
-            
 
             if (maxWidth < vMode.width) {
                 maxWidth = vMode.width;
@@ -51,9 +65,37 @@ public class GameClient {
         }
 
         buffer = new FrameBuffer(maxWidth, maxHeight, FrameBuffer.SAMPLINGMODE_HARDWARE_ONLY);
-        buffer.enableRenderer(IRenderer.RENDERER_OPENGL, IRenderer.MODE_OPENGL);
         buffer.disableRenderer(IRenderer.RENDERER_SOFTWARE);
+        canvas = buffer.enableGLCanvasRenderer();
 
+        canvas.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                gameLoop();
+            }
+        });
+
+        gameFrame.add(canvas, BorderLayout.CENTER);
+
+        gameLoop();
+
+        canvas.requestFocus();
     }
 
+    private void gameLoop() {
+        World w = new World();
+        buffer.clear(java.awt.Color.ORANGE);
+        w.renderScene(buffer);
+        w.draw(buffer);
+        buffer.update();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buffer.display(canvas.getGraphics());
+                canvas.paint(buffer.getGraphics());
+                canvas.update(buffer.getGraphics());
+                canvas.repaint();
+            }
+
+        });
+    }
 }
