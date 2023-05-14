@@ -1,4 +1,5 @@
 import java.awt.Font;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.io.*;
@@ -16,8 +17,6 @@ public class Server implements Runnable {
     private JFrame frame;
 
     private JTextArea textArea;
-
-    ServerRunning runServer;
 
     Server() {
         this("6000");
@@ -50,6 +49,10 @@ public class Server implements Runnable {
 
         System.out.println("Server is listening on port " + port);
 
+        Functions.serverIP = ip;
+
+        Functions.serverPort = port;
+
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -64,18 +67,20 @@ public class Server implements Runnable {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         ge.registerFont(helloHeadline);
 
-        runServer = new ServerRunning();
-
-        runServer.setRunning(true);
+        Functions.isServerRunning = true;
 
         Thread thread = new Thread(this);
         thread.start();
 
         frame = new JFrame("Server Running");
+        
+        frame.setUndecorated(true);
+        frame.setResizable(false);
+
         JButton closeButton = new JButton("Close Server");
         closeButton.addActionListener(e -> {
             frame.dispose();
-            runServer.setRunning(false);
+            Functions.isServerRunning = false;
             new Game();
         });
         textArea = new JTextArea(30, 100);
@@ -88,26 +93,21 @@ public class Server implements Runnable {
         frame.getContentPane().add(textArea);
         frame.getContentPane().add(buttonPanel);
         frame.pack();
-        frame.setSize(1280, 720);
+        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
+        // Enter full-screen mode
+        device.setFullScreenWindow(frame);
+        frame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
+
     }
 
-    private class ServerRunning {
-        private boolean running;
-
-        public void setRunning(boolean a) {
-            running = a;
-        }
-
-        public boolean getRunning() {
-            return running;
-        }
-    }
+    
 
     @Override
     public void run() {
-        while (runServer.getRunning()) {
+        while (Functions.isServerRunning) {
             Socket socket = null;
             try {
                 socket = server.accept();

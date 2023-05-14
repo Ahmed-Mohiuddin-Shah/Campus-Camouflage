@@ -16,7 +16,13 @@ public class Functions {
 
     private static String[] texturesJPG = {};
 
-    private static String[] texturesPNG = { "mainmenu" };
+    private static String[] texturesPNG = {};
+
+    static boolean isServerRunning = false;
+
+    static String serverIP = "";
+
+    static String serverPort = "";
 
     public static void loadMenu(World world) {
         Object3D look = null;
@@ -94,4 +100,6 @@ public class Functions {
         }
         world.getCamera().moveCamera(moveRes, SPEED);
     }
+
+    
 }

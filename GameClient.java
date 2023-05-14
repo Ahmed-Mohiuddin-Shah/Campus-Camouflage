@@ -1,26 +1,31 @@
-import java.awt.EventQueue;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
+import java.awt.*;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import javax.swing.JButton;
+import javax.swing.*;
 import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
+import java.io.File;
 
-public class GameClient extends JFrame implements KeyListener {
+public class GameClient {
     private JPanel panel;
-    static GameClient frame;
-    static RenderPanel gameWindow;
+    private JFrame frame;
 
     public GameClient() throws Exception {
-        panel = new JPanel();
-        setSize(1920, 1080);
+        Font helloHeadline = new Font("", Font.PLAIN, 0);
+        try {
+            helloHeadline = Font.createFont(Font.TRUETYPE_FONT, new File("resources/HelloHeadline.ttf"))
+                    .deriveFont(36f);
+        } catch (Exception e) {
+        }
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        ge.registerFont(helloHeadline);
+
+        frame = new JFrame("Log Screen");
+
+        frame.setUndecorated(true);
+        frame.setResizable(false);
+
+        
         
 
         JButton btnTest = new JButton("Left");
@@ -68,17 +73,8 @@ public class GameClient extends JFrame implements KeyListener {
                     frame = new GameClient();
                     frame.setVisible(true);
                     frame.setUndecorated(true);
-
-                    // Get the default graphics device
                     GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-
-                    // Enter full-screen mode
                     device.setFullScreenWindow(frame);
-
-                    // Exit full-screen mode
-                    // device.setFullScreenWindow(null);
-
-                    // Set the size of the frame to match the screen size
                     frame.setSize(1920, 1080);
                 } catch (Exception e) {
                     e.printStackTrace();

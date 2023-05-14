@@ -54,15 +54,11 @@ public class Game implements ActionListener {
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        
-        
-        
 
         // Enter full-screen mode
         device.setFullScreenWindow(frame);
         frame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
-        
     }
 
     public static void main(String[] args) {
@@ -77,11 +73,8 @@ public class Game implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Connect to Server":
-                try {
-                    GameClient.makeFrame();
-                } catch (Exception e1) {
-                }
                 frame.dispose();
+                new ClientCreationGUI();
                 break;
             case "Create Server":
                 new ServerCreationGUI();
@@ -90,6 +83,7 @@ public class Game implements ActionListener {
             case "Settings":
                 new Settings();
                 frame.dispose();
+                System.exit(0);
                 break;
             case "Exit":
                 System.exit(0);
