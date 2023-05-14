@@ -4,15 +4,15 @@ import java.awt.event.*;
 import java.io.File;
 
 public class Game implements ActionListener {
-    private JFrame frame;
+    JFrame frame;
 
-    private JButton clientButton, serverButton, settingsButton, exitButton;
+    JButton clientButton, serverButton, settingsButton, exitButton;
 
     Game() {
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
-            helloHeadline = Font.createFont(Font.TRUETYPE_FONT, new File("resources/HelloHeadline.ttf"))                                                                    
-                    .deriveFont(36f);
+            helloHeadline = Font.createFont(Font.TRUETYPE_FONT, new File("resources/HelloHeadline.ttf"))
+                    .deriveFont(120f);
         } catch (Exception e) {
         }
 
@@ -20,6 +20,8 @@ public class Game implements ActionListener {
         ge.registerFont(helloHeadline);
 
         frame = new JFrame("Campus Camouflage");
+        frame.setUndecorated(true);
+        frame.setResizable(false);
         JPanel buttonPanel = new JPanel(new GridLayout(4, 1));
 
         clientButton = new JButton("Connect to Server");
@@ -49,10 +51,18 @@ public class Game implements ActionListener {
         frame.add(l);
         frame.add(buttonPanel);
 
+        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1280, 720);
         frame.setVisible(true);
+        
+        
+        
 
+        // Enter full-screen mode
+        device.setFullScreenWindow(frame);
+        frame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
+
+        
     }
 
     public static void main(String[] args) {
@@ -79,7 +89,7 @@ public class Game implements ActionListener {
                 break;
             case "Settings":
                 new Settings();
-                // frame.dispose();
+                frame.dispose();
                 break;
             case "Exit":
                 System.exit(0);
@@ -88,8 +98,4 @@ public class Game implements ActionListener {
         }
 
     }
-    // clientButton = new JButton("Connect to Server");
-    // serverButton = new JButton("Create Server");
-    // settingsButton = new JButton("Settings");
-    // exitButton = new JButton("Exit");
 }
