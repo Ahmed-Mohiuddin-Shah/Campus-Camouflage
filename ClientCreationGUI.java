@@ -8,6 +8,8 @@ public class ClientCreationGUI implements ActionListener {
 
     private JButton connectButton, cancelButton;
 
+    GraphicsDevice device;
+
     JTextField ip;
     JTextField port;
     JTextField name;
@@ -24,7 +26,7 @@ public class ClientCreationGUI implements ActionListener {
         ge.registerFont(helloHeadline);
 
         frame = new JFrame("Create Server");
-        
+
         frame.setUndecorated(true);
         frame.setResizable(false);
 
@@ -40,7 +42,7 @@ public class ClientCreationGUI implements ActionListener {
 
         ip = new JTextField();
         port = new JTextField();
-        if (!Functions.serverIP.equals("") && !Functions.serverPort.equals("")){
+        if (!Functions.serverIP.equals("") && !Functions.serverPort.equals("")) {
             ip.setText(Functions.serverIP);
             port.setText(Functions.serverPort);
         }
@@ -75,7 +77,7 @@ public class ClientCreationGUI implements ActionListener {
         frame.add(cancelButton);
         frame.add(connectButton);
 
-        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+        device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
@@ -88,15 +90,19 @@ public class ClientCreationGUI implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "Create":
-                if (ip.getText().equals("") && port.getText().equals("")) {
-                    new Server();
-                } else if (ip.getText().equals("") && !port.getText().equals("")) {
-                    new Server(port.getText());
+            case "Connect":
+                if (!ip.getText().equals("") && !port.getText().equals("") && !name.getText().equals("")) {
+                    new GameClient();
+                    frame.dispose();
                 } else {
-                    new Server(ip.getText(), port.getText());
+                    connectButton.setText("Please Fill Fields!");
+                    int delay = 0750; // 3 seconds
+                    Timer timer = new Timer(delay, ae -> {
+                        connectButton.setText("Connect");
+                    });
+                    timer.setRepeats(false);
+                    timer.start();
                 }
-                frame.dispose();
                 break;
             case "Cancel":
                 new Game();

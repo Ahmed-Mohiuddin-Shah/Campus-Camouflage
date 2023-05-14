@@ -1,6 +1,9 @@
 import java.awt.*;
 
 import javax.swing.*;
+
+import com.threed.jpct.FrameBuffer;
+
 import java.awt.BorderLayout;
 import java.awt.event.*;
 import java.io.File;
@@ -8,8 +11,9 @@ import java.io.File;
 public class GameClient {
     private JPanel panel;
     private JFrame frame;
+    FrameBuffer buffer;
 
-    public GameClient() throws Exception {
+    public GameClient() {
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
             helloHeadline = Font.createFont(Font.TRUETYPE_FONT, new File("resources/HelloHeadline.ttf"))
@@ -24,45 +28,6 @@ public class GameClient {
 
         frame.setUndecorated(true);
         frame.setResizable(false);
-
-        
-        
-
-        JButton btnTest = new JButton("Left");
-        btnTest.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                panel.setVisible(false);
-            }
-        });
-
-        JButton btnRight = new JButton("Right");
-        btnRight.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                repaint();
-            }
-        });
-
-        JButton btnClose = new JButton("Close");
-        btnClose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                gameWindow.gameLoop = false;
-                frame.dispose();
-                new Game();
-            }
-        });
-
-        panel.setLayout(new GridLayout(3, 1));
-        panel.add(btnTest);
-        panel.add(btnRight);
-        panel.add(btnClose);
-        panel.addKeyListener(this);
-
-        add(panel, BorderLayout.WEST);
-
-        gameWindow = new RenderPanel();
-        gameWindow.addKeyListener(this);
-        add(gameWindow, BorderLayout.CENTER);
-        add(panel, BorderLayout.EAST);
 
     }
 
