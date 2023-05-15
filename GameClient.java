@@ -91,14 +91,22 @@ public class GameClient implements KeyListener, MouseMotionListener {
         gameThread.start();
     }
 
+    // TODO Test For mouse listener remove afterwards
+
+    Object3D mouseCube = Primitives.getSphere(1f);
+
     private void init() {
         world = new World();
+        mouseCube.build();
+        world.addObject(mouseCube);
         loadMap("testMap");
-
     }
 
     private void gameLoop() {
         while (gameLoop) {
+            
+            mouseCube.clearTranslation();
+            mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
             buffer.clear(java.awt.Color.ORANGE);
             world.renderScene(buffer);
             world.draw(buffer);
@@ -201,6 +209,5 @@ public class GameClient implements KeyListener, MouseMotionListener {
     public void mouseMoved(MouseEvent e) {
         mouseX = e.getX();
         mouseY = e.getY();
-        System.out.println("" + mouseX + ", " + mouseY);
     }
 }
