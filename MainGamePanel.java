@@ -36,10 +36,6 @@ public class MainGamePanel extends Canvas
         implements Runnable, MouseMotionListener, KeyListener, ComponentListener, IPaintListener {
     private static final long serialVersionUID = 1L;
 
-    private String[] texturesJPG = { "dome", "grass", "monk", "wall", "bckdrp", "sky" };
-
-    private String[] texturesPNG = { "cop", "banana", "frnchr" };
-
     private static final float DAMPING = 0.1f;
 
     private static final float SPEED = 3f;
@@ -171,11 +167,7 @@ public class MainGamePanel extends Canvas
 
     private void initStuff() {
 
-        for (int i = 0; i < texturesJPG.length; ++i) {
-
-            TextureManager.getInstance().addTexture(texturesJPG[i] + ".jpg",
-                    new Texture("resources/" + texturesJPG[i] + ".jpg"));
-        }
+        
 
         for (int i = 0; i < texturesPNG.length; ++i) {
 
@@ -198,7 +190,6 @@ public class MainGamePanel extends Canvas
             if (object3d.getName().contains("Player")) {
                 player = object3d;
             } else if (object3d.getName().contains("light")) {
-
                 light.setPosition(object3d.getTransformedCenter());
             } else {
                 object3d.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
@@ -299,27 +290,7 @@ public class MainGamePanel extends Canvas
 
     }
 
-    private SimpleVector getMouseWorldPosition() {
-        SimpleVector pos = new SimpleVector(2, -2, 2);
-        SimpleVector ray = Interact2D.reproject2D3DWS(world.getCamera(), buffer, mouseMapper.getMouseX(),
-                mouseMapper.getMouseY());
-        if (ray != null) {
-            SimpleVector norm = ray.normalize(); // Just to be sure...
-
-            float f = world.calcMinDistance(world.getCamera().getPosition(), norm, 1000);
-            if (f != Object3D.COLLISION_NONE) {
-                SimpleVector offset = new SimpleVector(norm);
-                norm.scalarMul(f);
-                norm = norm.calcSub(offset);
-                pos = new SimpleVector(norm);
-                pos.add(world.getCamera().getPosition());
-                pos.add(new SimpleVector(2, -2, 2));
-            } else {
-                pos.add(new SimpleVector(0, 0, 0));
-            }
-        }
-        return pos;
-    }
+    
 
     @Override
     public void keyTyped(KeyEvent e) {

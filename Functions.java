@@ -4,19 +4,19 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Functions {
-    private static KeyMapper keyMapper = new KeyMapper();
+    static KeyMapper keyMapper = new KeyMapper();
 
-    private static boolean up = false;
+    static boolean up = false;
 
-    private static boolean down = false;
+    static boolean down = false;
 
-    private static boolean left = false;
+    static boolean left = false;
 
-    private static boolean right = false;
+    static boolean right = false;
 
-    private static String[] texturesJPG = {};
+    static String[] texturesJPG = { "dome", "grass", "monk", "wall", "bckdrp", "sky" };
 
-    private static String[] texturesPNG = {};
+    static String[] texturesPNG = { "cop", "banana", "frnchr" };
 
     static boolean isServerRunning = false;
 
@@ -24,26 +24,34 @@ public class Functions {
 
     static String serverPort = "";
 
-    public static void loadMenu(World world) {
-        Object3D look = null;
+    static Object3D[] map;
+
+    public static void loadMap(World world, String mapName, Object3D player, Object3D[] props) {
+        // TODO Add props to props array
+
+        for (int i = 0; i < texturesJPG.length; ++i) {
+
+            TextureManager.getInstance().addTexture(texturesJPG[i] + ".jpg",
+                    new Texture("assets/textures/" + texturesJPG[i] + ".jpg"));
+        }
+
         for (int i = 0; i < texturesPNG.length; ++i) {
             TextureManager.getInstance().addTexture(texturesPNG[i] + ".png",
                     new Texture("assets/textures/" + texturesPNG[i] + ".png"));
         }
 
-        Object3D[] menu = Loader.load3DS("assets/menu.3ds", 1f);
-        for (Object3D object3d : menu) {
+        Object3D[] map = Loader.load3DS("assets/" + mapName + ".3ds", 1f);
+
+        for (Object3D object3d : map) {
             object3d.setCenter(SimpleVector.ORIGIN);
             object3d.rotateX((float) -Math.PI / 2);
             object3d.rotateMesh();
             object3d.setRotationMatrix(new Matrix());
-            if(object3d.getName().contains("Back")) {
-                look = object3d;
-            }
-            else if (object3d.getName().contains("cam")) {
-                world.getCamera().setPosition(object3d.getTransformedCenter());
-                world.getCamera().setClippingPlanes(0.1f, 1000000000f);
-                world.getCamera().lookAt(look.getTransformedCenter());
+            if (object3d.getName().contains("player")) {
+                player = object3d;
+                player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
+                world.addObject(player);
+                player.build();
             } else if (object3d.getName().contains("light")) {
                 Light light = new Light(world);
                 light.setIntensity(140, 120, 120);
@@ -55,7 +63,7 @@ public class Functions {
             }
             object3d.build();
         }
-        
+
         world.setAmbientLight(20, 20, 20);
         world.buildAllObjects();
     }
@@ -101,5 +109,50 @@ public class Functions {
         world.getCamera().moveCamera(moveRes, SPEED);
     }
 
-    
+    public static SimpleVector getMouseWorldPosition(FrameBuffer buffer, World world, int mouseX, int mouseY) {
+        SimpleVector pos = new SimpleVector(2, -2, 2);
+        SimpleVector ray = Interact2D.reproject2D3DWS(world.getCamera(), buffer, mouseX, mouseY);
+        if (ray != null) {
+            SimpleVector norm = ray.normalize(); // Just to be sure...
+
+            float f = world.calcMinDistance(world.getCamera().getPosition(), norm, 1000);
+            if (f != Object3D.COLLISION_NONE) {
+                SimpleVector offset = new SimpleVector(norm);
+                norm.scalarMul(f);
+                norm = norm.calcSub(offset);
+                pos = new SimpleVector(norm);
+                pos.add(world.getCamera().getPosition());
+                pos.add(new SimpleVector(2, -2, 2));
+            } else {
+                pos.add(new SimpleVector(0, 0, 0));
+            }
+        }
+        return pos;
+    }
+
+    static class Ticker {
+
+        private int rate;
+        private long s2;
+
+        public static long getTime() {
+            return System.currentTimeMillis();
+        }
+
+        public Ticker(int tickrateMS) {
+            rate = tickrateMS;
+            s2 = Ticker.getTime();
+        }
+
+        public int getTicks() {
+            long i = Ticker.getTime();
+            if (i - s2 > rate) {
+                int ticks = (int) ((i - s2) / (long) rate);
+                s2 += (long) rate * ticks;
+                return ticks;
+            }
+            return 0;
+        }
+    }
+
 }

@@ -7,12 +7,13 @@ import com.threed.jpct.*;
 import java.awt.event.*;
 import java.io.File;
 
-public class GameClient {
-    private JPanel panel;
+public class GameClient implements KeyListener {
     private JFrame pauseFrame, gameFrame;
     FrameBuffer buffer;
     GraphicsDevice device;
     Canvas canvas;
+    boolean gameLoop;
+    Thread gameThread;
 
     public GameClient() {
 
@@ -68,34 +69,58 @@ public class GameClient {
         buffer.disableRenderer(IRenderer.RENDERER_SOFTWARE);
         canvas = buffer.enableGLCanvasRenderer();
 
-        canvas.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                gameLoop();
-            }
-        });
-
         gameFrame.add(canvas, BorderLayout.CENTER);
-
-        gameLoop();
-
         canvas.requestFocus();
+        canvas.addKeyListener(this);
+        gameLoop = true;
+
+        gameThread = new Thread(new GameLoop());
+        gameThread.start();
     }
 
-    private void gameLoop() {
-        World w = new World();
-        buffer.clear(java.awt.Color.ORANGE);
-        w.renderScene(buffer);
-        w.draw(buffer);
-        buffer.update();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                buffer.display(canvas.getGraphics());
-                canvas.paint(buffer.getGraphics());
-                canvas.update(buffer.getGraphics());
-                canvas.repaint();
-            }
+    World w = new World();
 
-        });
+    private void gameLoop() {
+        while (gameLoop) {
+            buffer.clear(java.awt.Color.ORANGE);
+            w.renderScene(buffer);
+            w.draw(buffer);
+            buffer.update();
+            buffer.display(canvas.getGraphics());
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    public class GameLoop implements Runnable {
+
+        @Override
+        public void run() {
+            gameLoop();
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        switch (e.getKeyChar()) {
+            case 'p':
+                device.setFullScreenWindow(null);
+                device.setFullScreenWindow(pauseFrame);
+
+                System.out.println("afoijfa");
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
     }
 }
