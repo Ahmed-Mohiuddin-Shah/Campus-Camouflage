@@ -8,7 +8,7 @@ import com.threed.jpct.util.*;
 import java.awt.event.*;
 import java.io.File;
 
-public class GameClient implements KeyListener {
+public class GameClient implements KeyListener, MouseMotionListener {
     private JFrame pauseFrame, gameFrame;
     Object3D player = null;
     World world;
@@ -17,6 +17,11 @@ public class GameClient implements KeyListener {
     Canvas canvas;
     boolean gameLoop;
     Thread gameThread;
+
+    KeyMapper keyMapper;
+
+    int mouseX = 0;
+    int mouseY = 0;
 
     public GameClient() {
 
@@ -76,6 +81,8 @@ public class GameClient implements KeyListener {
         gameFrame.add(canvas, BorderLayout.CENTER);
         canvas.requestFocus();
         canvas.addKeyListener(this);
+        canvas.addMouseMotionListener(this);
+        keyMapper = new KeyMapper(canvas);
         gameLoop = true;
 
         init();
@@ -97,7 +104,7 @@ public class GameClient implements KeyListener {
             world.draw(buffer);
             buffer.update();
             buffer.display(canvas.getGraphics());
-            //TODO check if canvas.repaint is needed?
+            // TODO check if canvas.repaint is needed?
             canvas.repaint();
             try {
                 Thread.sleep(15);
@@ -184,5 +191,16 @@ public class GameClient implements KeyListener {
 
         world.setAmbientLight(20, 20, 20);
         world.buildAllObjects();
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        mouseX = e.getX();
+        mouseY = e.getY();
+        System.out.println("" + mouseX + ", " + mouseY);
     }
 }
