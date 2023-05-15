@@ -97,6 +97,7 @@ public class GameClient implements KeyListener {
             world.draw(buffer);
             buffer.update();
             buffer.display(canvas.getGraphics());
+            //TODO check if canvas.repaint is needed?
             canvas.repaint();
             try {
                 Thread.sleep(15);
