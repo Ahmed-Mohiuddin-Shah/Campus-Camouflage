@@ -24,8 +24,6 @@ public class Functions {
 
     static String serverPort = "";
 
-    static Object3D[] map;
-
     public static void loadMap(World world, String mapName, Object3D player, Object3D[] props) {
         // TODO Add props to props array
 
@@ -51,6 +49,10 @@ public class Functions {
                 player = object3d;
                 player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
                 world.addObject(player);
+                Camera cam = world.getCamera();
+                cam.moveCamera(Camera.CAMERA_MOVEOUT, 100);
+                cam.lookAt(player.getTransformedCenter());
+                cam.setFovAngle((float) (Math.PI * 120 / 180));
                 player.build();
             } else if (object3d.getName().contains("light")) {
                 Light light = new Light(world);

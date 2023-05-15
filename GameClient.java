@@ -3,12 +3,15 @@ import java.awt.*;
 import javax.swing.*;
 
 import com.threed.jpct.*;
+import com.threed.jpct.util.*;
 
 import java.awt.event.*;
 import java.io.File;
 
 public class GameClient implements KeyListener {
     private JFrame pauseFrame, gameFrame;
+    Object3D player = null;
+    World world;
     FrameBuffer buffer;
     GraphicsDevice device;
     Canvas canvas;
@@ -27,7 +30,8 @@ public class GameClient implements KeyListener {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         ge.registerFont(helloHeadline);
 
-        pauseFrame = new JFrame("Campus Camouflage");
+        pauseFrame = new JFrame("Campus Camouflage Paused");
+        pauseFrame.addKeyListener(this);
 
         pauseFrame.setUndecorated(true);
         pauseFrame.setResizable(false);
@@ -74,19 +78,26 @@ public class GameClient implements KeyListener {
         canvas.addKeyListener(this);
         gameLoop = true;
 
+        init();
+
         gameThread = new Thread(new GameLoop());
         gameThread.start();
     }
 
-    World w = new World();
+    private void init() {
+        world = new World();
+        loadMap("testMap");
+
+    }
 
     private void gameLoop() {
         while (gameLoop) {
             buffer.clear(java.awt.Color.ORANGE);
-            w.renderScene(buffer);
-            w.draw(buffer);
+            world.renderScene(buffer);
+            world.draw(buffer);
             buffer.update();
             buffer.display(canvas.getGraphics());
+            canvas.repaint();
             try {
                 Thread.sleep(15);
             } catch (InterruptedException e) {
@@ -104,16 +115,6 @@ public class GameClient implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        switch (e.getKeyChar()) {
-            case 'p':
-                device.setFullScreenWindow(null);
-                device.setFullScreenWindow(pauseFrame);
-
-                System.out.println("afoijfa");
-                break;
-            default:
-                break;
-        }
     }
 
     @Override
@@ -122,5 +123,65 @@ public class GameClient implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        switch (e.getKeyChar()) {
+            case 'p':
+                if (!device.getFullScreenWindow().toString().contains("Paused")) {
+                    device.setFullScreenWindow(null);
+                    device.setFullScreenWindow(pauseFrame);
+                } else {
+                    device.setFullScreenWindow(gameFrame);
+                    gameFrame.setSize(device.getFullScreenWindow().getWidth(),
+                            device.getFullScreenWindow().getHeight());
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void loadMap(String mapName) {
+        // TODO Add props to props array
+
+        for (int i = 0; i < Functions.texturesJPG.length; ++i) {
+
+            TextureManager.getInstance().addTexture(Functions.texturesJPG[i] + ".jpg",
+                    new Texture("assets/textures/" + Functions.texturesJPG[i] + ".jpg"));
+        }
+
+        for (int i = 0; i < Functions.texturesPNG.length; ++i) {
+            TextureManager.getInstance().addTexture(Functions.texturesPNG[i] + ".png",
+                    new Texture("assets/textures/" + Functions.texturesPNG[i] + ".png"));
+        }
+
+        Object3D[] map = Loader.load3DS("assets/" + mapName + ".3ds", 1f);
+
+        for (Object3D object3d : map) {
+            object3d.setCenter(SimpleVector.ORIGIN);
+            object3d.rotateX((float) -Math.PI / 2);
+            object3d.rotateMesh();
+            object3d.setRotationMatrix(new Matrix());
+            if (object3d.getName().contains("player")) {
+                player = object3d;
+                player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
+                world.addObject(player);
+                Camera cam = world.getCamera();
+                cam.moveCamera(Camera.CAMERA_MOVEOUT, 100);
+                cam.lookAt(player.getTransformedCenter());
+                cam.setFovAngle((float) (Math.PI * 120 / 180));
+                player.build();
+            } else if (object3d.getName().contains("light")) {
+                Light light = new Light(world);
+                light.setIntensity(140, 120, 120);
+                light.setAttenuation(-1);
+                light.setPosition(object3d.getTransformedCenter());
+            } else {
+                object3d.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
+                world.addObject(object3d);
+            }
+            object3d.build();
+        }
+
+        world.setAmbientLight(20, 20, 20);
+        world.buildAllObjects();
     }
 }
