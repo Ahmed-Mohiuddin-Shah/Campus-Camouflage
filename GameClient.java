@@ -9,6 +9,17 @@ import java.awt.event.*;
 import java.io.File;
 
 public class GameClient implements KeyListener, MouseMotionListener {
+
+    private static final float DAMPING = 0.1f;
+
+    private static final float SPEED = 3f;
+
+    private static final float MAXSPEED = 4f;
+
+    private SimpleVector moveRes = new SimpleVector(0, 0, 0);
+
+    private SimpleVector ellipsoid = new SimpleVector(5, 15, 5);
+
     private JFrame pauseFrame, gameFrame;
     Object3D player = null;
     World world;
@@ -17,6 +28,11 @@ public class GameClient implements KeyListener, MouseMotionListener {
     Canvas canvas;
     boolean gameLoop;
     Thread gameThread;
+
+    boolean up = false;
+    boolean down = false;
+    boolean left = false;
+    boolean right = false;
 
     KeyMapper keyMapper;
 
@@ -104,9 +120,14 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
     private void gameLoop() {
         while (gameLoop) {
-            
+
             mouseCube.clearTranslation();
             mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
+            moveCamera();
+            world.getCamera().align(player);
+            world.getCamera().setPosition(player.getTransformedCenter());
+            world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, 100f);
+            world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, 20f);
             buffer.clear(java.awt.Color.ORANGE);
             world.renderScene(buffer);
             world.draw(buffer);
@@ -176,7 +197,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
             object3d.rotateX((float) -Math.PI / 2);
             object3d.rotateMesh();
             object3d.setRotationMatrix(new Matrix());
-            if (object3d.getName().contains("player")) {
+            if (object3d.getName().contains("Player")) {
+                System.out.println("done");
                 player = object3d;
                 player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
                 world.addObject(player);
@@ -210,4 +232,71 @@ public class GameClient implements KeyListener, MouseMotionListener {
         mouseX = e.getX();
         mouseY = e.getY();
     }
+
+    public void moveCamera() {
+        KeyState ks = null;
+        while ((ks = keyMapper.poll()) != KeyState.NONE) {
+            if (ks.getKeyCode() == KeyEvent.VK_W) {
+                up = ks.getState();
+            }
+            if (ks.getKeyCode() == KeyEvent.VK_S) {
+                down = ks.getState();
+            }
+            if (ks.getKeyCode() == KeyEvent.VK_A) {
+                left = ks.getState();
+            }
+            if (ks.getKeyCode() == KeyEvent.VK_D) {
+                right = ks.getState();
+            }
+
+            if (ks.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                gameLoop = false;
+            }
+        }
+
+        // move the cube
+        if (up) {
+            SimpleVector t = player.getZAxis();
+            t.scalarMul(SPEED);
+            moveRes.add(t);
+        }
+
+        if (down) {
+            SimpleVector t = player.getZAxis();
+            t.scalarMul(-SPEED);
+            moveRes.add(t);
+        }
+
+        if (left) {
+            player.rotateY((float) Math.toRadians(-1));
+        }
+
+        if (right) {
+            player.rotateY((float) Math.toRadians(1));
+        }
+
+        // avoid high speeds
+        if (moveRes.length() > MAXSPEED) {
+            moveRes.makeEqualLength(new SimpleVector(0, 0, MAXSPEED));
+        }
+
+        player.translate(0, -0.02f, 0);
+
+        moveRes = player.checkForCollisionEllipsoid(moveRes, ellipsoid, 8);
+        player.translate(moveRes);
+
+        // finally apply the gravity:
+        SimpleVector t = new SimpleVector(0, 1, 0);
+        t = player.checkForCollisionEllipsoid(t, ellipsoid, 1);
+        player.translate(t);
+
+        // damping
+        if (moveRes.length() > DAMPING) {
+            moveRes.makeEqualLength(new SimpleVector(0, 0, DAMPING));
+        } else {
+            moveRes = new SimpleVector(0, 0, 0);
+        }
+    }
+
+    // This looks like chatGPT wrote it but I cant deny free work so i'll allow it.
 }
