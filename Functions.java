@@ -1,6 +1,5 @@
 import com.threed.jpct.*;
 import com.threed.jpct.util.*;
-import java.awt.*;
 import java.awt.event.*;
 
 public class Functions {
