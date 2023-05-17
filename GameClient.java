@@ -22,6 +22,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
     private JFrame pauseFrame, gameFrame;
     Object3D player = null;
+    Object3D[] map;
     World world;
     FrameBuffer buffer;
     GraphicsDevice device;
@@ -190,7 +191,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
                     new Texture("assets/textures/" + Functions.texturesPNG[i] + ".png"));
         }
 
-        Object3D[] map = Loader.load3DS("assets/" + mapName + ".3ds", 1f);
+        map = Loader.load3DS("assets/" + mapName + ".3ds", 1f);
 
         for (Object3D object3d : map) {
             object3d.setCenter(SimpleVector.ORIGIN);
