@@ -16,6 +16,9 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
     private static final float MAXSPEED = 4f;
 
+    float mouseXRatio = 0;
+    float mouseYRatio = 0;
+
     private SimpleVector moveRes = new SimpleVector(0, 0, 0);
 
     private SimpleVector ellipsoid = new SimpleVector(5, 15, 5);
@@ -90,6 +93,9 @@ public class GameClient implements KeyListener, MouseMotionListener {
             }
 
         }
+
+        mouseXRatio = maxWidth / device.getFullScreenWindow().getWidth();
+        mouseYRatio = maxHeight / device.getFullScreenWindow().getHeight();
 
         buffer = new FrameBuffer(maxWidth, maxHeight, FrameBuffer.SAMPLINGMODE_HARDWARE_ONLY);
         buffer.disableRenderer(IRenderer.RENDERER_SOFTWARE);
@@ -198,7 +204,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
             object3d.rotateX((float) -Math.PI / 2);
             object3d.rotateMesh();
             object3d.setRotationMatrix(new Matrix());
-            if (object3d.getName().contains("Player")) {
+            if (object3d.getName().contains("cop")) {
                 System.out.println("done");
                 player = object3d;
                 player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
@@ -230,8 +236,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
+        mouseX = (int) (e.getX() * mouseXRatio);
+        mouseY = (int) (e.getY() * mouseYRatio);
     }
 
     public void moveCamera() {
@@ -299,5 +305,4 @@ public class GameClient implements KeyListener, MouseMotionListener {
         }
     }
 
-    // This looks like chatGPT wrote it but I cant deny free work so i'll allow it.
 }
