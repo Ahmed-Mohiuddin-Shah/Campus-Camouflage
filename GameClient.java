@@ -114,9 +114,9 @@ public class GameClient implements KeyListener, MouseMotionListener {
         gameThread.start();
     }
 
-    // TODO Test For mouse listener remove afterwards
+    // TODO Test For mouse listener, remove afterwards
 
-    Object3D mouseCube = Primitives.getSphere(1f);
+    Object3D mouseCube = Primitives.getPyramide(2f);
 
     private void init() {
         world = new World();
