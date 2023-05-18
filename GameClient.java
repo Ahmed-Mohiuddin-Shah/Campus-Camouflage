@@ -66,7 +66,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         pauseFrame.setVisible(true);
 
         // // Enter full-screen mode
-        // device.setFullScreenWindow(frame);
+        device.setFullScreenWindow(pauseFrame);
         pauseFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
         gameFrame = new JFrame("Campus Camouflage");
@@ -78,8 +78,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
 
-        // // Enter full-screen mode
-        device.setFullScreenWindow(gameFrame);
         gameFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
         int maxWidth = 800;
