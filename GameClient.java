@@ -195,7 +195,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
                     new Texture("assets/textures/" + Functions.texturesPNG[i] + ".png"));
         }
 
-        map = Loader.load3DS("assets/" + mapName + ".3ds", 1f);
+        map = Loader.load3DS("assets/map/" + mapName + ".3ds", 1f);
 
         for (Object3D object3d : map) {
             object3d.setCenter(SimpleVector.ORIGIN);
