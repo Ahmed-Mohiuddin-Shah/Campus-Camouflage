@@ -106,7 +106,11 @@ public class GameClient implements KeyListener, MouseMotionListener {
         keyMapper = new KeyMapper(canvas);
         gameLoop = true;
 
+        // TODO add load text to pauseFrame
+
         init();
+
+
 
         gameThread = new Thread(new GameLoop());
         gameThread.start();
