@@ -66,7 +66,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         pauseFrame.setVisible(true);
 
         // // Enter full-screen mode
-        device.setFullScreenWindow(pauseFrame);
+
         pauseFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
         gameFrame = new JFrame("Campus Camouflage");
@@ -77,7 +77,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
-
+        device.setFullScreenWindow(gameFrame);
         gameFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
         int maxWidth = 800;
@@ -108,16 +108,19 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
         // TODO improve pauseFrame
 
-        JTextField loadText = new JTextField();
+        // JTextField loadText = new JTextField();
 
-        pauseFrame.add(loadText);
-        
-        loadText.setText("Loading..");
-        
+        // pauseFrame.add(loadText);
+
+        // loadText.setText("Loading..");
+
+        // Thread initThread = new Thread(new Init());
+        // initThread.start();
+
+        // loadText.addKeyListener(this);
+        // loadText.setText("Loaded");
 
         init();
-
-        loadText.setText("Loaded");
 
         gameThread = new Thread(new GameLoop());
         gameThread.start();
@@ -155,6 +158,14 @@ public class GameClient implements KeyListener, MouseMotionListener {
                 Thread.sleep(15);
             } catch (InterruptedException e) {
             }
+        }
+    }
+
+    public class Init implements Runnable {
+
+        @Override
+        public void run() {
+            init();
         }
     }
 
