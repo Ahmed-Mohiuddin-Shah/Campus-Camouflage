@@ -24,8 +24,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
     private SimpleVector ellipsoid = new SimpleVector(5, 15, 5);
 
     private JFrame pauseFrame, gameFrame;
-    JPanel panel1;
-    JTextField messegeField;
+    JPanel panel1, panel2, panel3, panel4;
+    JTextField messageField;
     JTextArea serverLog, messageArea;
 
     Object3D player = null;
@@ -120,7 +120,36 @@ public class GameClient implements KeyListener, MouseMotionListener {
         serverLog.setFont(helloHeadline);
         serverLog.setEditable(false);
 
-        panel1 = new JPanel(new GridLayout(3, 1));
+        panel1 = new JPanel(new GridLayout(2, 1));
+
+        panel4 = new JPanel(new GridLayout(2, 1));
+        JButton resumeButton = new JButton("Resume");
+        resumeButton.addActionListener(e -> {
+            device.setFullScreenWindow(gameFrame);
+            gameFrame.setSize(device.getFullScreenWindow().getWidth(),
+                    device.getFullScreenWindow().getHeight());
+        });
+        JButton closeServer = new JButton("Leave");
+        closeServer.addActionListener(e -> {
+            if (e.getActionCommand().equals("Leave")) {
+                closeServer.setText("Are you Sure?");
+                int delay = 0750; // 3 seconds
+                Timer timer = new Timer(delay, ae -> {
+                    closeServer.setText("Leave");
+                });
+                timer.setRepeats(false);
+                timer.start();
+            } else {
+                gameLoop = false;
+                gameFrame.dispose();
+                pauseFrame.dispose();
+                new Game();
+            }
+        });
+
+        panel4.add(resumeButton);
+        panel4.add(closeServer);
+        panel1.add(panel4);
 
         pauseFrame.add(serverLog);
         pauseFrame.add(panel1);
@@ -155,7 +184,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
             world.draw(buffer);
             buffer.update();
             buffer.display(canvas.getGraphics());
-            // TODO check if canvas.repaint is needed?
             canvas.repaint();
             try {
                 Thread.sleep(15);
