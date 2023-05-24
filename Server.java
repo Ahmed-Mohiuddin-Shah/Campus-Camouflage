@@ -29,7 +29,7 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        addTextServerLog("Server Started");
+        addTextServerLog(textArea, "Server Started");
 
         while (Functions.isServerRunning) {
             Socket socket = null;
@@ -75,7 +75,7 @@ public class Server implements Runnable {
         }
     }
 
-    private void addTextServerLog(String string) {
+    public static void addTextServerLog(JTextArea textArea, String string) {
         textArea.append("\n" + string);
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }

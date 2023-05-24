@@ -24,6 +24,10 @@ public class GameClient implements KeyListener, MouseMotionListener {
     private SimpleVector ellipsoid = new SimpleVector(5, 15, 5);
 
     private JFrame pauseFrame, gameFrame;
+    JPanel panel1;
+    JTextField messegeField;
+    JTextArea serverLog, messageArea;
+
     Object3D player = null;
     Object3D[] map;
     World world;
@@ -56,6 +60,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         ge.registerFont(helloHeadline);
 
         pauseFrame = new JFrame("Campus Camouflage Paused");
+        pauseFrame.setLayout(new GridLayout(1, 2));
         pauseFrame.addKeyListener(this);
 
         pauseFrame.setUndecorated(true);
@@ -66,6 +71,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         pauseFrame.setVisible(true);
 
         // // Enter full-screen mode
+        device.setFullScreenWindow(pauseFrame);
 
         pauseFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
@@ -77,7 +83,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
         device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setVisible(true);
-        device.setFullScreenWindow(gameFrame);
         gameFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
         int maxWidth = 800;
@@ -107,20 +112,18 @@ public class GameClient implements KeyListener, MouseMotionListener {
         gameLoop = true;
 
         // TODO improve pauseFrame
-
-        // JTextField loadText = new JTextField();
-
-        // pauseFrame.add(loadText);
-
-        // loadText.setText("Loading..");
-
-        // Thread initThread = new Thread(new Init());
-        // initThread.start();
-
-        // loadText.addKeyListener(this);
-        // loadText.setText("Loaded");
-
         init();
+
+        serverLog = new JTextArea();
+        serverLog.setText("      ");
+        serverLog.setAutoscrolls(true);
+        serverLog.setFont(helloHeadline);
+        serverLog.setEditable(false);
+
+        panel1 = new JPanel(new GridLayout(3, 1));
+
+        pauseFrame.add(serverLog);
+        pauseFrame.add(panel1);
 
         gameThread = new Thread(new GameLoop());
         gameThread.start();
@@ -192,6 +195,9 @@ public class GameClient implements KeyListener, MouseMotionListener {
                 if (!device.getFullScreenWindow().toString().contains("Paused")) {
                     device.setFullScreenWindow(null);
                     device.setFullScreenWindow(pauseFrame);
+
+                    pauseFrame.setSize(device.getFullScreenWindow().getWidth(),
+                            device.getFullScreenWindow().getHeight());
                 } else {
                     device.setFullScreenWindow(gameFrame);
                     gameFrame.setSize(device.getFullScreenWindow().getWidth(),
