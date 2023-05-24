@@ -188,6 +188,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
             try {
                 Thread.sleep(15);
             } catch (InterruptedException e) {
+                
             }
         }
     }
