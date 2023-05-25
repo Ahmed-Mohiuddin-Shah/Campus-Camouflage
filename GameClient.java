@@ -147,9 +147,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
             }
         });
 
-        panel4.add(resumeButton);
-        panel4.add(closeServer);
-        panel1.add(panel4);
+        panel1.add(resumeButton);
+        panel1.add(closeServer);
 
         pauseFrame.add(serverLog);
         pauseFrame.add(panel1);
@@ -188,7 +187,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
             try {
                 Thread.sleep(15);
             } catch (InterruptedException e) {
-                
+
             }
         }
     }
