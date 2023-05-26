@@ -4,9 +4,9 @@ import java.net.*;
 
 import javax.swing.*;
 
-import org.json.simple.*;
-import org.json.simple.parser.*;
-import org.json.*;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Server implements Runnable {
     private ServerSocket server;
