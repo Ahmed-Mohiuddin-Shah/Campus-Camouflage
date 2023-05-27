@@ -4,11 +4,17 @@ import java.net.*;
 
 import javax.swing.*;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class Server implements Runnable {
+    Gson gson;
+
+    GameState gs;
+
+    String gameState;
+
     private ServerSocket server;
 
     static JFrame frame;
@@ -49,27 +55,34 @@ public class Server implements Runnable {
 
     class ServerThread extends Thread {
         private Socket socket;
+        private boolean readName;
 
         public ServerThread(Socket socket) {
             this.socket = socket;
+            readName = false;
         }
 
         public void run() {
             try {
+
                 InputStream input = socket.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
                 OutputStream output = socket.getOutputStream();
                 PrintWriter writer = new PrintWriter(output, true);
 
-                String text;
+                String recievedString;
+
+                recievedString = reader.readLine();
+                gs.players.add(recievedString);
+
+                gameState = gson.toJson(gs);
+
+                System.out.println(gameState);
 
                 do {
-                    text = reader.readLine();
-                    String reverseText = new StringBuilder(text).reverse().toString();
-                    writer.println("Server: " + reverseText);
 
-                } while (!text.equals("bye"));
+                } while (!recievedString.equals("bye"));
 
                 socket.close();
             } catch (IOException ex) {
@@ -85,6 +98,15 @@ public class Server implements Runnable {
     }
 
     private void init(String ip, String port) {
+
+        gson = new Gson();
+
+        gs = new GameState();
+
+        gameState = gson.toJson(gs);
+
+        System.out.println(gameState);
+
         InetAddress ipAddress = null;
         try {
             ipAddress = InetAddress.getByName("");

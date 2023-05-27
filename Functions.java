@@ -23,6 +23,8 @@ public class Functions {
 
     static String serverPort = "";
 
+    static String mapName = "";
+
     public static void loadMap(World world, String mapName, Object3D player, Object3D[] props) {
         // TODO Add props to props array
 

@@ -165,7 +165,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         world = new World();
         mouseCube.build();
         world.addObject(mouseCube);
-        loadMap("testMap");
+        loadMap(Functions.mapName);
     }
 
     private void gameLoop() {
