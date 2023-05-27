@@ -11,8 +11,8 @@ public class GameState {
     ArrayList<String> seekers;
 
     GameState() {
-        players = new ArrayList<String>(40);
-        hiders = new ArrayList<String>(20);
-        seekers = new ArrayList<String>(20);
+        players = new ArrayList<String>(5);
+        hiders = new ArrayList<String>(5);
+        seekers = new ArrayList<String>(5);
     }
 }

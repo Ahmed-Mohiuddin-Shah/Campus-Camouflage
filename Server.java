@@ -15,6 +15,8 @@ public class Server implements Runnable {
 
     String gameState;
 
+    boolean isServerFull = false;
+
     private ServerSocket server;
 
     static JFrame frame;
@@ -42,14 +44,26 @@ public class Server implements Runnable {
         addTextServerLog(textArea, "Server Started");
 
         while (Functions.isServerRunning) {
-            Socket socket = null;
-            try {
-                socket = server.accept();
-            } catch (IOException e) {
-            }
-            textArea.append("\n New client connected");
+            System.out.println(gs.players.size());
+            if (gs.players.size() > 4) {
+                if (!isServerFull) {
+                    addTextServerLog(textArea, "Server Full!!!!!");
+                    isServerFull = true;
+                }
+            } else {
+                if (isServerFull) {
+                    isServerFull = false;
+                }
+                Socket socket = null;
+                try {
+                    socket = server.accept();
 
-            new ServerThread(socket).start();
+                } catch (IOException e) {
+                }
+                textArea.append("\n New client connected");
+
+                new ServerThread(socket).start();
+            }
         }
     }
 
