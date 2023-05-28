@@ -17,6 +17,8 @@ public class Server implements Runnable {
 
     boolean isServerFull = false;
 
+    Functions.Ticker ticker;
+
     private ServerSocket server;
 
     static JFrame frame;
@@ -44,8 +46,7 @@ public class Server implements Runnable {
         addTextServerLog(textArea, "Server Started");
 
         while (Functions.isServerRunning) {
-            System.out.println(gs.players.size());
-            if (gs.players.size() > 4) {
+            if (gs.playersInfo.size() > 4) {
                 if (!isServerFull) {
                     addTextServerLog(textArea, "Server Full!!!!!");
                     isServerFull = true;
@@ -69,11 +70,9 @@ public class Server implements Runnable {
 
     class ServerThread extends Thread {
         private Socket socket;
-        private boolean readName;
 
         public ServerThread(Socket socket) {
             this.socket = socket;
-            readName = false;
         }
 
         public void run() {
@@ -88,7 +87,7 @@ public class Server implements Runnable {
                 String recievedString;
 
                 recievedString = reader.readLine();
-                gs.players.add(recievedString);
+                gs.addNewPlayer(recievedString, recievedString, recievedString, recievedString, recievedString);
 
                 gameState = gson.toJson(gs);
 
