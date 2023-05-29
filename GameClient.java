@@ -10,6 +10,10 @@ import java.io.File;
 
 public class GameClient implements KeyListener, MouseMotionListener {
 
+    Client client;
+
+    GameState gameState;
+
     private static final float DAMPING = 0.1f;
 
     private static final float SPEED = 3f;
@@ -47,7 +51,11 @@ public class GameClient implements KeyListener, MouseMotionListener {
     int mouseX = 0;
     int mouseY = 0;
 
-    public GameClient() {
+    public GameClient(String ip, String port, String name) {
+
+        gameState = new GameState();
+
+        client = new Client(ip, port, name);
 
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
@@ -170,7 +178,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
     private void gameLoop() {
         while (gameLoop) {
-
             mouseCube.clearTranslation();
             mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
             moveCamera();

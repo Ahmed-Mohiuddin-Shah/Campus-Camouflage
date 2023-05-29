@@ -11,9 +11,9 @@ import com.google.gson.JsonParser;
 public class Server implements Runnable {
     Gson gson;
 
-    GameState gs;
+    GameState gameState;
 
-    String gameState;
+    String gameStateString;
 
     boolean isServerFull = false;
 
@@ -46,7 +46,7 @@ public class Server implements Runnable {
         addTextServerLog(textArea, "Server Started");
 
         while (Functions.isServerRunning) {
-            if (gs.playersInfo.size() > 4) {
+            if (gameState.playersInfo.size() > 4) {
                 if (!isServerFull) {
                     addTextServerLog(textArea, "Server Full!!!!!");
                     isServerFull = true;
@@ -87,11 +87,11 @@ public class Server implements Runnable {
                 String recievedString;
 
                 recievedString = reader.readLine();
-                gs.addNewPlayer(recievedString, recievedString, recievedString, recievedString, recievedString);
+                gameState.addNewPlayer(recievedString, recievedString, recievedString, recievedString, recievedString);
 
-                gameState = gson.toJson(gs);
+                gameStateString = gson.toJson(gameState);
 
-                System.out.println(gameState);
+                System.out.println(gameStateString);
 
                 do {
 
@@ -114,11 +114,11 @@ public class Server implements Runnable {
 
         gson = new Gson();
 
-        gs = new GameState();
+        gameState = new GameState();
 
-        gameState = gson.toJson(gs);
+        gameStateString = gson.toJson(gameState);
 
-        System.out.println(gameState);
+        System.out.println(gameStateString);
 
         InetAddress ipAddress = null;
         try {

@@ -92,7 +92,7 @@ public class ClientCreationGUI implements ActionListener {
         switch (e.getActionCommand()) {
             case "Connect":
                 if (!ip.getText().equals("") && !port.getText().equals("") && !name.getText().equals("")) {
-                    new GameClient();
+                    new GameClient(ip.getText(), port.getText(), name.getText());
                     frame.dispose();
                 } else {
                     connectButton.setText("Please Fill Fields!");
