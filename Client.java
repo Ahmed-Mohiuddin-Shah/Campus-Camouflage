@@ -21,7 +21,7 @@ public class Client extends Thread {
 
         gson = new Gson();
         gameState = new GameState();
-        gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
+        
 
         try {
             socket = new Socket(ip, Integer.parseInt(port));
@@ -39,6 +39,8 @@ public class Client extends Thread {
             writer = new PrintWriter(output, true);
         } catch (IOException e) {
         }
+
+        gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
     }
 
     public void writeGameStateToServer(String gameStateString) {
