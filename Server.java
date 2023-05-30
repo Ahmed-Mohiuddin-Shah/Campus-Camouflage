@@ -94,7 +94,7 @@ public class Server implements Runnable {
                 System.out.println(gameStateString);
 
                 do {
-
+                    
                 } while (!recievedString.equals("bye"));
 
                 socket.close();

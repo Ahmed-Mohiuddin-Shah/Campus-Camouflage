@@ -43,4 +43,13 @@ public class Client {
         }
         return s;
     }
+
+    public void closeClient() {
+        writer.print("bye");
+        writer.flush();
+        try {
+            socket.close();
+        } catch (IOException e) {
+        }
+    }
 }
