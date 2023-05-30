@@ -1,10 +1,15 @@
 import java.io.*;
 import java.net.*;
 
-public class Client {
+import com.google.gson.Gson;
+
+public class Client extends Thread {
     private String ip;
     private String port;
     private String name;
+
+    Gson gson;
+    GameState gameState;
 
     private BufferedReader reader;
     private PrintWriter writer;
@@ -12,6 +17,12 @@ public class Client {
     private Socket socket;
 
     Client(String ip, String port, String name) {
+        super();
+
+        gson = new Gson();
+        gameState = new GameState();
+        gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
+
         try {
             socket = new Socket(ip, Integer.parseInt(port));
         } catch (NumberFormatException | IOException e) {
@@ -51,5 +62,12 @@ public class Client {
             socket.close();
         } catch (IOException e) {
         }
+    }
+
+    public void run() {
+        
+            gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
+
+            writeGameStateToServer(gson.toJson(gameState));
     }
 }

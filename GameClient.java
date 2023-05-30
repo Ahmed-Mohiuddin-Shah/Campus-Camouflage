@@ -2,6 +2,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import com.google.gson.Gson;
 import com.threed.jpct.*;
 import com.threed.jpct.util.*;
 
@@ -9,10 +10,9 @@ import java.awt.event.*;
 import java.io.File;
 
 public class GameClient implements KeyListener, MouseMotionListener {
+    String name;
 
     Client client;
-
-    GameState gameState;
 
     private static final float DAMPING = 0.1f;
 
@@ -52,8 +52,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
     int mouseY = 0;
 
     public GameClient(String ip, String port, String name) {
-
-        gameState = new GameState();
+        this.name = name;
 
         client = new Client(ip, port, name);
 
@@ -177,10 +176,15 @@ public class GameClient implements KeyListener, MouseMotionListener {
     }
 
     private void gameLoop() {
+        client.start();
         while (gameLoop) {
             mouseCube.clearTranslation();
             mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
             moveCamera();
+
+            client.gameState.updatePosition(name,
+                    player.getTranslation().x + " " + player.getTranslation().y + " " + player.getTranslation().z);
+
             world.getCamera().align(player);
             world.getCamera().setPosition(player.getTransformedCenter());
             world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, 100f);
