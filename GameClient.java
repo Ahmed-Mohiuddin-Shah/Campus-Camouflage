@@ -197,6 +197,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
             }
         }
+
+        client.closeClient();
     }
 
     public class Init implements Runnable {
