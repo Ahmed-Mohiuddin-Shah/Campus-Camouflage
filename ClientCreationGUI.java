@@ -81,9 +81,9 @@ public class ClientCreationGUI implements ActionListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
-        // Enter full-screen mode
-        device.setFullScreenWindow(frame);
-        frame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
+        // // Enter full-screen mode
+        // device.setFullScreenWindow(frame);
+        frame.setSize(1280, 720);
 
     }
 

@@ -21,24 +21,21 @@ public class Client extends Thread {
 
         gson = new Gson();
         gameState = new GameState();
-        
 
         try {
             socket = new Socket(ip, Integer.parseInt(port));
-        } catch (NumberFormatException | IOException e) {
-        }
-        this.ip = ip;
-        this.port = port;
-        this.name = name;
-
-        try (InputStream input = socket.getInputStream()) {
+            this.ip = ip;
+            this.port = port;
+            this.name = name;
+            InputStream input = socket.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
-        } catch (IOException e1) {
-        }
-        try (OutputStream output = socket.getOutputStream()) {
+            OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
-        } catch (IOException e) {
+        } catch (NumberFormatException | IOException e) {
+            
         }
+
+        writer.print(name);
 
         gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
     }
@@ -49,7 +46,7 @@ public class Client extends Thread {
     }
 
     public String readGameStateFromServer() {
-        String s = null;
+        String s = gson.toJson(gameState);
         try {
             s = reader.readLine();
         } catch (IOException e) {
@@ -67,9 +64,9 @@ public class Client extends Thread {
     }
 
     public void run() {
-        
-            gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
 
-            writeGameStateToServer(gson.toJson(gameState));
+        gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
+
+        writeGameStateToServer(gson.toJson(gameState));
     }
 }
