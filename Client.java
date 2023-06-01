@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
 
+import org.lwjgl.Sys;
+
 import com.google.gson.Gson;
 
 public class Client implements Runnable {
@@ -19,8 +21,6 @@ public class Client implements Runnable {
     private Socket socket;
 
     Client(String ip, String port, String name) {
-        super();
-
         stopClient = false;
         gson = new Gson();
         gameState = new GameState();
@@ -38,11 +38,11 @@ public class Client implements Runnable {
 
         }
 
-        writer.print(name);
+        writer.println(name);
     }
 
     public void writeGameStateToServer(String gameStateString) {
-        writer.print(gameStateString);
+        writer.println(gameStateString);
     }
 
     public String readGameStateFromServer() {
@@ -56,7 +56,7 @@ public class Client implements Runnable {
 
     public void closeClient() {
         stopClient = true;
-        writer.print("bye");
+        writer.println("bye");
         writer.flush();
         try {
             socket.close();
@@ -67,12 +67,9 @@ public class Client implements Runnable {
     @Override
     public void run() {
         while (!stopClient) {
-            System.out.println("i am in thread");
             String s = readGameStateFromServer();
-            System.out.println(s);
             gameState = gson.fromJson(s, GameState.class);
             writeGameStateToServer(gson.toJson(gameState));
-            System.out.println("I ran");
         }
     }
 }
