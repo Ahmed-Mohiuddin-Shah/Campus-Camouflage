@@ -91,7 +91,7 @@ public class Server implements Runnable {
 
                 gameStateString = gson.toJson(gameState);
 
-                writer.write(gameStateString);
+                writer.print(gameStateString);
 
                 do {
                     recievedString = reader.readLine();
@@ -99,8 +99,8 @@ public class Server implements Runnable {
                     gameState = gson.fromJson(recievedString, GameState.class);
 
                     gameStateString = gson.toJson(gameState);
-
-                    writer.write(gameStateString);
+                    System.out.println(gameStateString);
+                    writer.print(gameStateString);
 
                     addTextServerLog(textArea, recievedString);
                 } while (!recievedString.equals("bye"));

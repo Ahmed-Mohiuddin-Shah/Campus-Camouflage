@@ -3,13 +3,15 @@ import java.net.*;
 
 import com.google.gson.Gson;
 
-public class Client extends Thread {
+public class Client implements Runnable {
     private String ip;
     private String port;
     private String name;
 
     Gson gson;
     GameState gameState;
+
+    boolean stopClient;
 
     private BufferedReader reader;
     private PrintWriter writer;
@@ -19,6 +21,7 @@ public class Client extends Thread {
     Client(String ip, String port, String name) {
         super();
 
+        stopClient = false;
         gson = new Gson();
         gameState = new GameState();
 
@@ -32,17 +35,14 @@ public class Client extends Thread {
             OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
         } catch (NumberFormatException | IOException e) {
-            
+
         }
 
         writer.print(name);
-
-        gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
     }
 
     public void writeGameStateToServer(String gameStateString) {
         writer.print(gameStateString);
-        writer.flush();
     }
 
     public String readGameStateFromServer() {
@@ -55,6 +55,7 @@ public class Client extends Thread {
     }
 
     public void closeClient() {
+        stopClient = true;
         writer.print("bye");
         writer.flush();
         try {
@@ -63,10 +64,15 @@ public class Client extends Thread {
         }
     }
 
+    @Override
     public void run() {
-
-        gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
-
-        writeGameStateToServer(gson.toJson(gameState));
+        while (!stopClient) {
+            System.out.println("i am in thread");
+            String s = readGameStateFromServer();
+            System.out.println(s);
+            gameState = gson.fromJson(s, GameState.class);
+            writeGameStateToServer(gson.toJson(gameState));
+            System.out.println("I ran");
+        }
     }
 }

@@ -39,7 +39,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
     GraphicsDevice device;
     Canvas canvas;
     boolean gameLoop;
-    Thread gameThread;
+    Thread gameThread, clientThread;
 
     boolean up = false;
     boolean down = false;
@@ -53,8 +53,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
     public GameClient(String ip, String port, String name) {
         this.name = name;
-
-        client = new Client(ip, port, name);
 
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
@@ -160,6 +158,10 @@ public class GameClient implements KeyListener, MouseMotionListener {
         pauseFrame.add(serverLog);
         pauseFrame.add(panel1);
 
+        client = new Client(ip, port, name);
+        clientThread = new Thread(client);
+        
+
         gameThread = new Thread(new GameLoop());
         gameThread.start();
     }
@@ -176,7 +178,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
     }
 
     private void gameLoop() {
-        client.start();
+        clientThread.start();
         while (gameLoop) {
             mouseCube.clearTranslation();
             mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
