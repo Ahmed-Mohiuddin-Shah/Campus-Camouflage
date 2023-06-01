@@ -25,6 +25,16 @@ public class Functions {
 
     static String mapName = "testMap";
 
+    public static String simpleVectorToString(SimpleVector simpleVector) {
+        return simpleVector.x + "," + simpleVector.y + "," + simpleVector.z;
+    }
+
+    public static SimpleVector stringToSimpleVector(String string) {
+        String[] tokens = string.split(",");
+        return new SimpleVector(Double.parseDouble(tokens[0]), Double.parseDouble(tokens[1]),
+                Double.parseDouble(tokens[2]));
+    }
+
     public static void loadMap(World world, String mapName, Object3D player, Object3D[] props) {
         // TODO Add props to props array
 
