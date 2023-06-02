@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.*;
 
@@ -11,7 +12,7 @@ import com.google.gson.JsonParser;
 public class Server implements Runnable {
     Gson gson;
 
-    GameState gameState;
+    GameState serverGameState;
 
     String gameStateString;
 
@@ -46,7 +47,7 @@ public class Server implements Runnable {
         addTextServerLog(textArea, "Server Started");
 
         while (Functions.isServerRunning) {
-            if (gameState.playersInfo.size() > 4) {
+            if (serverGameState.playersInfo.size() > 4) {
                 if (!isServerFull) {
                     addTextServerLog(textArea, "Server Full!!!!!");
                     isServerFull = true;
@@ -87,18 +88,18 @@ public class Server implements Runnable {
                 String recievedString;
 
                 recievedString = reader.readLine();
-                gameState.addNewPlayer(recievedString, "0 0 0", recievedString, recievedString, recievedString);
+                serverGameState.addNewPlayer(recievedString, "0 0 0", recievedString, recievedString, recievedString);
 
-                gameStateString = gson.toJson(gameState);
+                gameStateString = gson.toJson(serverGameState);
 
                 writer.println(gameStateString);
 
                 do {
                     recievedString = reader.readLine();
 
-                    gameState = gson.fromJson(recievedString, GameState.class);
+                    serverGameState = gson.fromJson(recievedString, GameState.class);
 
-                    gameStateString = gson.toJson(gameState);
+                    gameStateString = gson.toJson(serverGameState);
                     System.out.println(gameStateString);
                     writer.println(gameStateString);
 
@@ -122,9 +123,9 @@ public class Server implements Runnable {
 
         gson = new Gson();
 
-        gameState = new GameState();
+        serverGameState = new GameState();
 
-        gameStateString = gson.toJson(gameState);
+        gameStateString = gson.toJson(serverGameState);
 
         System.out.println(gameStateString);
 
