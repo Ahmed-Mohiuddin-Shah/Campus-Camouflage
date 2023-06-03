@@ -98,14 +98,15 @@ public class Server implements Runnable {
                 writer.println(gameStateString);
                 do {
                     recievedString = reader.readLine();
-                    if (recievedString.equals("bye")) {
+                    if (recievedString.equals("bye") || recievedString.equals(null) ) {
                         break;
                     }
-                    serverGameState = gson.fromJson(recievedString, GameState.class);
+                    clientGameState = gson.fromJson(recievedString, GameState.class);
+                    serverGameState.updatePlayer(clientName, clientGameState);
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
                 } while (!recievedString.equals("bye"));
-                addTextServerLog(textArea, clientName + " just left!");
+                addTextServerLog(textArea, clientName + (recievedString.equals("bye") ? " just left!":" disconnected!"));
                 socket.close();
             } catch (IOException ex) {
                 System.out.println("Server exception: " + ex.getMessage());

@@ -1,4 +1,7 @@
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.threed.jpct.SimpleVector;
+
 import java.util.ArrayList;
 
 public class GameState {
@@ -8,10 +11,11 @@ public class GameState {
         playersInfo = new ConcurrentHashMap<>();
     }
 
-    public void addNewPlayer(String name, String position, String status, String hitWhat, String currentModel) {
+    public void addNewPlayer(String name, SimpleVector playerPosition, String status, String hitWhat,
+            String currentModel) {
         ArrayList<String> playerInfo = new ArrayList<>(5);
         playerInfo.add(name);
-        playerInfo.add(position);
+        playerInfo.add(Functions.simpleVectorToString(playerPosition));
         playerInfo.add(status);
         playerInfo.add(hitWhat);
         playerInfo.add(currentModel);
@@ -26,8 +30,8 @@ public class GameState {
         playersInfo.remove(name);
     }
 
-    public void updatePosition(String name, String position) {
-        playersInfo.get(name).set(1, position);
+    public void updatePosition(String name, SimpleVector playerPosition) {
+        playersInfo.get(name).set(1, Functions.simpleVectorToString(playerPosition));
     }
 
     public void updateStatus(String name, String status) {
@@ -40,5 +44,9 @@ public class GameState {
 
     public void updateCurrentModel(String name, String currentModel) {
         playersInfo.get(name).set(4, currentModel);
+    }
+
+    public void updatePlayer(String name, GameState clientGameState) {
+        playersInfo.put(name, clientGameState.playersInfo.get(name));
     }
 }
