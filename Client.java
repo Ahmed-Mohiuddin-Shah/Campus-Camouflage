@@ -54,6 +54,8 @@ public class Client implements Runnable {
             s = reader.readLine();
         } catch (IOException e) {
         }
+        s = s.equals(null) ? gson.toJson(gameState) : s;
+        System.out.println(s);
         return s;
     }
 
@@ -70,11 +72,10 @@ public class Client implements Runnable {
     @Override
     public void run() {
         writer.println(gson.toJson(gameState));
-        gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
         while (!clientStates.get("stopClient")) {
             if (clientStates.get("shouldSend")) {
-                writeGameStateToServer(gson.toJson(gameState));
                 gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
+                writeGameStateToServer(gson.toJson(gameState));
                 clientStates.put("shouldSend", false);
             }
         }

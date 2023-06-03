@@ -95,7 +95,7 @@ public class Server implements Runnable {
         public void run() {
             try {
                 addTextServerLog(textArea, clientName + " just joined!");
-                writer.println(gameStateString);
+                writer.println(gson.toJson(serverGameState));
                 do {
                     recievedString = reader.readLine();
                     if (recievedString.equals("bye") || recievedString.equals(null) ) {

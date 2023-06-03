@@ -31,7 +31,9 @@ public class GameState {
     }
 
     public void updatePosition(String name, SimpleVector playerPosition) {
-        playersInfo.get(name).set(1, Functions.simpleVectorToString(playerPosition));
+        if (playersInfo.equals(null)) {
+            playersInfo.get(name).set(1, Functions.simpleVectorToString(playerPosition));
+        }
     }
 
     public void updateStatus(String name, String status) {
