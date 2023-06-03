@@ -84,21 +84,23 @@ public class Server implements Runnable {
 
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
-
-                clientName = reader.readLine();
-                clientGameState = gson.fromJson(reader.readLine(), GameState.class);
-                serverGameState.addNewPlayer(clientName, serverGameState);
             } catch (Exception e) {
             }
         }
 
         public void run() {
             try {
+                {
+                    String[] tempStrings = reader.readLine().split(" ");
+                    clientName = tempStrings[0];
+                    clientGameState = gson.fromJson(tempStrings[1], GameState.class);
+                }
+                serverGameState.addNewPlayer(clientName, serverGameState);
                 addTextServerLog(textArea, clientName + " just joined!");
                 writer.println(gson.toJson(serverGameState));
                 do {
                     recievedString = reader.readLine();
-                    if (recievedString.equals("bye") || recievedString.equals(null) ) {
+                    if (recievedString.equals("bye") || recievedString.equals(null)) {
                         break;
                     }
                     clientGameState = gson.fromJson(recievedString, GameState.class);
@@ -106,9 +108,10 @@ public class Server implements Runnable {
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
                 } while (!recievedString.equals("bye"));
-                addTextServerLog(textArea, clientName + (recievedString.equals("bye") ? " just left!":" disconnected!"));
+                addTextServerLog(textArea,
+                        clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));
                 socket.close();
-            } catch (IOException ex) {
+            } catch (IOException | ArrayIndexOutOfBoundsException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
                 ex.printStackTrace();
             }

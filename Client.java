@@ -40,8 +40,6 @@ public class Client implements Runnable {
         } catch (NumberFormatException | IOException e) {
 
         }
-
-        writer.println(name);
     }
 
     public void writeGameStateToServer(String gameStateString) {
@@ -54,8 +52,6 @@ public class Client implements Runnable {
             s = reader.readLine();
         } catch (IOException e) {
         }
-        s = s.equals(null) ? gson.toJson(gameState) : s;
-        System.out.println(s);
         return s;
     }
 
@@ -71,7 +67,7 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
-        writer.println(gson.toJson(gameState));
+        writer.println(name + " " + gson.toJson(gameState));
         while (!clientStates.get("stopClient")) {
             if (clientStates.get("shouldSend")) {
                 gameState = gson.fromJson(readGameStateFromServer(), GameState.class);

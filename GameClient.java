@@ -185,10 +185,11 @@ public class GameClient implements KeyListener, MouseMotionListener {
     private void gameLoop() {
 
         client = new Client(ip, port, name);
-        clientThread = new Thread(client);
         client.gameState.addNewPlayer(name, player.getTransformedCenter(), "non", "non",
                 player.getName());
+        clientThread = new Thread(client);
         clientThread.start();
+
         while (gameLoop) {
             mouseCube.clearTranslation();
             mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
