@@ -11,6 +11,7 @@ public class Client implements Runnable {
 
     Gson gson;
     GameState gameState;
+    GameState serverGameState;
     ConcurrentHashMap<String, Boolean> clientStates;
 
     boolean stopClient;
@@ -27,6 +28,7 @@ public class Client implements Runnable {
         stopClient = false;
         gson = new Gson();
         gameState = new GameState();
+        serverGameState = new GameState();
 
         try {
             socket = new Socket(ip, Integer.parseInt(port));
@@ -70,10 +72,10 @@ public class Client implements Runnable {
         writer.println(name + " " + gson.toJson(gameState));
         do {
             if (clientStates.get("shouldSend")) {
-            System.out.println("in");
-            gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
-            writeGameStateToServer(gson.toJson(gameState));
-            clientStates.put("shouldSend", false);
+                serverGameState = gson.fromJson(readGameStateFromServer(), GameState.class);
+                gameState.syncWithOtherGameState(name, serverGameState);
+                writeGameStateToServer(gson.toJson(gameState));
+                clientStates.put("shouldSend", false);
             }
         } while (!clientStates.get("stopClient"));
     }

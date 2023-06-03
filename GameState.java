@@ -51,4 +51,12 @@ public class GameState {
     public void updatePlayer(String name, GameState clientGameState) {
         playersInfo.put(name, clientGameState.playersInfo.get(name));
     }
+
+    public void syncWithOtherGameState(String excludeName, GameState gameState) {
+        for (String keyID : gameState.playersInfo.keySet()) {
+            if (!keyID.equals(excludeName)) {
+                playersInfo.put(keyID, gameState.playersInfo.get(keyID));
+            }
+        }
+    }
 }
