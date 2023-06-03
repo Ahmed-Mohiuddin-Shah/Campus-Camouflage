@@ -100,10 +100,8 @@ public class Server implements Runnable {
                     serverGameState = gson.fromJson(recievedString, GameState.class);
 
                     gameStateString = gson.toJson(serverGameState);
-                    System.out.println(gameStateString);
                     writer.println(gameStateString);
 
-                    addTextServerLog(textArea, recievedString);
                 } while (!recievedString.equals("bye"));
 
                 socket.close();

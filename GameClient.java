@@ -184,8 +184,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
             mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
             moveCamera();
 
-            client.gameState.updatePosition(name,
-                    player.getTranslation().x + " " + player.getTranslation().y + " " + player.getTranslation().z);
+            //client.gameState.updatePosition(name,
+                    //player.getTranslation().x + " " + player.getTranslation().y + " " + player.getTranslation().z);
 
             world.getCamera().align(player);
             world.getCamera().setPosition(player.getTransformedCenter());

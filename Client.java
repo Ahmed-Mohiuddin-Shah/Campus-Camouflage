@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
-
-import org.lwjgl.Sys;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.Gson;
 
@@ -67,8 +66,7 @@ public class Client implements Runnable {
     @Override
     public void run() {
         while (!stopClient) {
-            String s = readGameStateFromServer();
-            gameState = gson.fromJson(s, GameState.class);
+            gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
             writeGameStateToServer(gson.toJson(gameState));
         }
     }
