@@ -89,7 +89,6 @@ public class Server implements Runnable {
                 clientName = reader.readLine();
                 clientGameState = gson.fromJson(reader.readLine(), GameState.class);
                 serverGameState.addNewPlayer(clientName, serverGameState);
-                addTextServerLog(textArea, clientName + "just joined!");
             } catch (Exception e) {
 
             }
@@ -97,6 +96,8 @@ public class Server implements Runnable {
 
         public void run() {
             try {
+
+                addTextServerLog(textArea, clientName + " just joined!");
                 writer.println(gameStateString);
                 do {
                     recievedString = reader.readLine();
@@ -104,6 +105,7 @@ public class Server implements Runnable {
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
                 } while (!recievedString.equals("bye"));
+                addTextServerLog(textArea, clientName + " just left!");
                 socket.close();
             } catch (IOException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
