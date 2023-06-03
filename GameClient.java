@@ -139,18 +139,22 @@ public class GameClient implements KeyListener, MouseMotionListener {
             gameFrame.setSize(device.getFullScreenWindow().getWidth(),
                     device.getFullScreenWindow().getHeight());
         });
-        JButton closeServer = new JButton("Leave");
-        closeServer.addActionListener(e -> {
+        JButton leaveServer = new JButton("Leave");
+        leaveServer.addActionListener(e -> {
             if (e.getActionCommand().equals("Leave")) {
-                closeServer.setText("Are you Sure?");
+                leaveServer.setText("Are you Sure?");
                 int delay = 0750; // 3 seconds
                 Timer timer = new Timer(delay, ae -> {
-                    closeServer.setText("Leave");
+                    leaveServer.setText("Leave");
                 });
                 timer.setRepeats(false);
                 timer.start();
             } else {
                 gameLoop = false;
+                try {
+                    client.closeClient();
+                } catch (Exception e1) {
+                }
                 gameFrame.dispose();
                 pauseFrame.dispose();
                 new Game();
@@ -158,7 +162,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         });
 
         panel1.add(resumeButton);
-        panel1.add(closeServer);
+        panel1.add(leaveServer);
 
         pauseFrame.add(serverLog);
         pauseFrame.add(panel1);
@@ -210,7 +214,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
             }
         }
-
         client.closeClient();
     }
 
