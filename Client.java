@@ -22,7 +22,7 @@ public class Client implements Runnable {
 
     Client(String ip, String port, String name) {
         clientStates = new ConcurrentHashMap<>();
-        clientStates.put("stopClient", true);
+        clientStates.put("stopClient", false);
         clientStates.put("shouldSend", true);
         stopClient = false;
         gson = new Gson();
@@ -68,13 +68,14 @@ public class Client implements Runnable {
     @Override
     public void run() {
         writer.println(name + " " + gson.toJson(gameState));
-        while (!clientStates.get("stopClient")) {
+        do {
             if (clientStates.get("shouldSend")) {
-                gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
-                writeGameStateToServer(gson.toJson(gameState));
-                clientStates.put("shouldSend", false);
+            System.out.println("in");
+            gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
+            writeGameStateToServer(gson.toJson(gameState));
+            clientStates.put("shouldSend", false);
             }
-        }
+        } while (!clientStates.get("stopClient"));
     }
 
     public void sendGameState() {
