@@ -107,6 +107,8 @@ public class Server implements Runnable {
                     serverGameState.updatePlayer(clientName, clientGameState);
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
+                    addTextServerLog(textArea,
+                            gson.toJson(serverGameState));
                 } while (!recievedString.equals("bye"));
                 addTextServerLog(textArea,
                         clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));

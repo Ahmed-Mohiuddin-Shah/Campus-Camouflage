@@ -23,7 +23,7 @@ public class Client implements Runnable {
     Client(String ip, String port, String name) {
         clientStates = new ConcurrentHashMap<>();
         clientStates.put("stopClient", true);
-        clientStates.put("shouldSend", false);
+        clientStates.put("shouldSend", true);
         stopClient = false;
         gson = new Gson();
         gameState = new GameState();
