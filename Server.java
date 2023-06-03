@@ -99,6 +99,7 @@ public class Server implements Runnable {
                 addTextServerLog(textArea, clientName + " just joined!");
                 writer.println(gson.toJson(serverGameState));
                 do {
+                    int count = 0;
                     recievedString = reader.readLine();
                     if (recievedString.equals("bye") || recievedString.equals(null)) {
                         break;
@@ -107,8 +108,12 @@ public class Server implements Runnable {
                     serverGameState.updatePlayer(clientName, clientGameState);
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
-                    addTextServerLog(textArea,
-                            gson.toJson(serverGameState));
+
+                    if (count < 30) {
+                        addTextServerLog(textArea,
+                                serverGameState.playersInfo.get(clientName).get(1));
+                        count = 0;
+                    }
                 } while (!recievedString.equals("bye"));
                 addTextServerLog(textArea,
                         clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));
