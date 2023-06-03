@@ -51,8 +51,13 @@ public class GameClient implements KeyListener, MouseMotionListener {
     int mouseX = 0;
     int mouseY = 0;
 
+    String ip;
+    String port;
+
     public GameClient(String ip, String port, String name) {
         this.name = name;
+        this.ip = ip;
+        this.port = port;
 
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
@@ -158,10 +163,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
         pauseFrame.add(serverLog);
         pauseFrame.add(panel1);
 
-        client = new Client(ip, port, name);
-        clientThread = new Thread(client);
-        
-
         gameThread = new Thread(new GameLoop());
         gameThread.start();
     }
@@ -178,14 +179,20 @@ public class GameClient implements KeyListener, MouseMotionListener {
     }
 
     private void gameLoop() {
+
+        client = new Client(ip, port, name);
+        clientThread = new Thread(client);
+        client.gameState.addNewPlayer(name, Functions.simpleVectorToString(player.getTransformedCenter()), "non", "non",
+                player.getName());
         clientThread.start();
         while (gameLoop) {
             mouseCube.clearTranslation();
             mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
             moveCamera();
 
-            //client.gameState.updatePosition(name,
-                    //player.getTranslation().x + " " + player.getTranslation().y + " " + player.getTranslation().z);
+            // client.gameState.updatePosition(name,
+            // player.getTranslation().x + " " + player.getTranslation().y + " " +
+            // player.getTranslation().z);
 
             world.getCamera().align(player);
             world.getCamera().setPosition(player.getTransformedCenter());

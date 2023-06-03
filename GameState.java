@@ -18,6 +18,10 @@ public class GameState {
         playersInfo.put(name, playerInfo);
     }
 
+    public void addNewPlayer(String name, GameState gameState) {
+        playersInfo.put(name, gameState.playersInfo.get(name));
+    }
+
     public void removePlayer(String name) {
         playersInfo.remove(name);
     }

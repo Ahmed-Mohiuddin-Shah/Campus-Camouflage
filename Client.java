@@ -65,6 +65,7 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
+        writer.println(gson.toJson(gameState));
         while (!stopClient) {
             gameState = gson.fromJson(readGameStateFromServer(), GameState.class);
             writeGameStateToServer(gson.toJson(gameState));

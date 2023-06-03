@@ -62,7 +62,6 @@ public class Server implements Runnable {
 
                 } catch (IOException e) {
                 }
-                textArea.append("\n New client connected");
 
                 new ServerThread(socket).start();
             }
@@ -71,21 +70,33 @@ public class Server implements Runnable {
 
     class ServerThread extends Thread {
         private Socket socket;
+        private String recievedString;
+        private String clientName;
+        private BufferedReader reader;
+        private PrintWriter writer;
+        private GameState clientGameState;
 
         public ServerThread(Socket socket) {
             this.socket = socket;
+            try {
+
+                InputStream input = socket.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(input));
+
+                OutputStream output = socket.getOutputStream();
+                writer = new PrintWriter(output, true);
+
+                clientName = reader.readLine();
+                clientGameState = gson.fromJson(reader.readLine(), GameState.class);
+                serverGameState.addNewPlayer(clientName, serverGameState);
+                addTextServerLog(textArea, clientName + "just joined!");
+            } catch (Exception e) {
+
+            }
         }
 
         public void run() {
             try {
-
-                InputStream input = socket.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-                OutputStream output = socket.getOutputStream();
-                PrintWriter writer = new PrintWriter(output, true);
-
-                String recievedString;
 
                 recievedString = reader.readLine();
                 serverGameState.addNewPlayer(recievedString, "0 0 0", recievedString, recievedString, recievedString);
