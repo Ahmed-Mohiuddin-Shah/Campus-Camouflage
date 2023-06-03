@@ -78,19 +78,19 @@ public class Server implements Runnable {
 
         public ServerThread(Socket socket) {
             this.socket = socket;
+            try {InputStream input = socket.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(input));
+
+            OutputStream output = socket.getOutputStream();
+            writer = new PrintWriter(output, true);
+
+            clientName = reader.readLine();
+            clientGameState = gson.fromJson(reader.readLine(), GameState.class);
+            serverGameState.addNewPlayer(clientName, serverGameState);} catch (Exception e){}
         }
 
         public void run() {
             try {
-                InputStream input = socket.getInputStream();
-                reader = new BufferedReader(new InputStreamReader(input));
-
-                OutputStream output = socket.getOutputStream();
-                writer = new PrintWriter(output, true);
-
-                clientName = reader.readLine();
-                clientGameState = gson.fromJson(reader.readLine(), GameState.class);
-                serverGameState.addNewPlayer(clientName, serverGameState);
                 addTextServerLog(textArea, clientName + "just joined!");
                 writer.println(gameStateString);
                 do {
