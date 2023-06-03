@@ -97,24 +97,13 @@ public class Server implements Runnable {
 
         public void run() {
             try {
-
-                recievedString = reader.readLine();
-                serverGameState.addNewPlayer(recievedString, "0 0 0", recievedString, recievedString, recievedString);
-
-                gameStateString = gson.toJson(serverGameState);
-
                 writer.println(gameStateString);
-
                 do {
                     recievedString = reader.readLine();
-
                     serverGameState = gson.fromJson(recievedString, GameState.class);
-
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
-
                 } while (!recievedString.equals("bye"));
-
                 socket.close();
             } catch (IOException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
