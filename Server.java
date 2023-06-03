@@ -95,7 +95,7 @@ public class Server implements Runnable {
                     clientName = tempStrings[0];
                     clientGameState = gson.fromJson(tempStrings[1], GameState.class);
                 }
-                serverGameState.addNewPlayer(clientName, serverGameState);
+                serverGameState.addNewPlayer(clientName, clientGameState);
                 addTextServerLog(textArea, clientName + " just joined!");
                 writer.println(gson.toJson(serverGameState));
                 do {
