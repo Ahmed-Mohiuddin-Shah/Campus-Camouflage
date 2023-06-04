@@ -9,7 +9,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 
-public class GameClient implements KeyListener, MouseMotionListener {
+public class GameClient implements KeyListener, MouseMotionListener, CollisionListener {
     String name;
 
     Client client;
@@ -185,6 +185,11 @@ public class GameClient implements KeyListener, MouseMotionListener {
         pauseFrame.add(serverLog);
         pauseFrame.add(panel1);
 
+        // Collision Listeners
+        mouseTargetTriangle.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
+        mouseTargetTriangle.addCollisionListener(this);
+        mouseTargetTriangle.enableCollisionListeners();
+
         gameThread = new Thread(new GameLoop());
         gameThread.start();
     }
@@ -207,6 +212,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
         while (gameLoop) {
             mouseTargetTriangle.clearTranslation();
             mouseTargetTriangle.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
+            mouseTargetTriangle.checkForCollision(world.getCamera().getDirection(), 1);
             moveCamera();
 
             client.gameState.updatePosition(name, player.getTransformedCenter());
@@ -419,6 +425,28 @@ public class GameClient implements KeyListener, MouseMotionListener {
         } else {
             moveRes = new SimpleVector(0, 0, 0);
         }
+    }
+
+    @Override
+    public void collision(CollisionEvent ce) {
+        if (ce.getObject().equals(mouseTargetTriangle)) {
+            for (Object3D object3d : ce.getTargets()) {
+                System.out.println(object3d.getName());
+            }
+            if (ce.getTargets()[0].getName().contains("prp")) {
+                System.out.println("RED");
+                mouseTargetTriangle.setAdditionalColor(Color.RED);
+            } else {
+                mouseTargetTriangle.setAdditionalColor(Color.BLUE);
+            }
+        } else {
+
+        }
+    }
+
+    @Override
+    public boolean requiresPolygonIDs() {
+        return false;
     }
 
 }
