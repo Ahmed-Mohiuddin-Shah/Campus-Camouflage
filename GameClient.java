@@ -40,6 +40,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
     JTextArea serverLog, messageArea;
 
     Object3D player = null;
+    Object3D mouseTargetTriangle = Primitives.getPyramide(2f);
     Object3D[] map;
     World world;
     FrameBuffer buffer;
@@ -186,14 +187,10 @@ public class GameClient implements KeyListener, MouseMotionListener {
         gameThread.start();
     }
 
-    // TODO Test For mouse listener, remove afterwards
-
-    Object3D mouseCube = Primitives.getPyramide(2f);
-
     private void init() {
         world = new World();
-        mouseCube.build();
-        world.addObject(mouseCube);
+        mouseTargetTriangle.build();
+        world.addObject(mouseTargetTriangle);
         loadMap(Functions.mapName);
     }
 
@@ -206,8 +203,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
         clientThread.start();
 
         while (gameLoop) {
-            mouseCube.clearTranslation();
-            mouseCube.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
+            mouseTargetTriangle.clearTranslation();
+            mouseTargetTriangle.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
             moveCamera();
 
             client.gameState.updatePosition(name, player.getTransformedCenter());
