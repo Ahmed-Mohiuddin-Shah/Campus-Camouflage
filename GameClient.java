@@ -209,13 +209,14 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
         client = new Client(ip, port, name);
         client.gameState.addNewPlayer(name, player.getTransformedCenter(), "non", "non",
-                player.getName());
+                player.getName(), "seeker");
         clientThread = new Thread(client);
         clientThread.start();
 
         while (gameLoop) {
             mouseTarget.clearTranslation();
             mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
+            mouseTarget.translate(1, 1, 1);
             mouseTarget.checkForCollision(world.getCamera().getDirection(), 20f);
             moveCamera();
 
@@ -226,7 +227,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             // world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, -10f);
 
             // playerHeight = player.getMesh().getBoundingBox()[3] -
-            // player.getMesh().getBoundingBox()[2];
+                    // player.getMesh().getBoundingBox()[2];
 
             // world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, playerHeight / 4);
             world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, 100f);
@@ -443,10 +444,8 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             mouseWasOn = ce.getTargets()[0].getName();
             if (mouseWasOn.contains("prp")) {
                 mouseTarget.setAdditionalColor(Color.RED);
-                client.gameState.updateHitWhat(name, ce.getTargets()[0].getName());
             } else {
                 mouseTarget.setAdditionalColor(Color.BLUE);
-                client.gameState.updateHitWhat(name, ce.getTargets()[0].getName());
             }
         } else {
 
@@ -468,8 +467,14 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                         break;
                     }
                 }
-
             }
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            client.gameState.updateHitWhat(name,
+                    mouseWasOn + "\u00B1" + Functions.simpleVectorToString(player.getTransformedCenter()));
+        } else {
+            client.gameState.updateHitWhat(name,
+                    "non");
         }
     }
 
@@ -492,9 +497,11 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
     public void changePlayerModel(Object3D model) {
         client.gameState.updateCurrentModel(name, mouseWasOn);
         world.removeObject(player);
-        SimpleVector prevPosition = player.getTransformedCenter();
         player.clearTranslation();
         player = model.cloneObject();
+        playerHeight = player.getMesh().getBoundingBox()[3] -
+                player.getMesh().getBoundingBox()[2];
+        player.translate(0, -playerHeight, 0);
         player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
         player.setCollisionOptimization(true);
         player.build();

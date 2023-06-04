@@ -12,13 +12,14 @@ public class GameState {
     }
 
     public void addNewPlayer(String name, SimpleVector playerPosition, String status, String hitWhat,
-            String currentModel) {
+            String currentModel, String currentRank) {
         ArrayList<String> playerInfo = new ArrayList<>(5);
         playerInfo.add(name);
         playerInfo.add(Functions.simpleVectorToString(playerPosition));
         playerInfo.add(status);
         playerInfo.add(hitWhat);
         playerInfo.add(currentModel);
+        playerInfo.add(currentRank);
         playersInfo.put(name, playerInfo);
     }
 
@@ -45,6 +46,10 @@ public class GameState {
 
     public void updateCurrentModel(String name, String currentModel) {
         playersInfo.get(name).set(4, currentModel);
+    }
+
+    public void updateCurrentRank(String name, String currentRank) {
+        
     }
 
     public void updatePlayer(String name, GameState clientGameState) {
