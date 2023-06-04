@@ -118,6 +118,7 @@ public class Server implements Runnable {
                 addTextServerLog(textArea,
                         clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));
                 socket.close();
+                serverGameState.removePlayer(clientName);
             } catch (IOException | ArrayIndexOutOfBoundsException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
                 ex.printStackTrace();
