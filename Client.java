@@ -70,7 +70,7 @@ public class Client implements Runnable {
     @Override
     public void run() {
         //TODO What if server disconnects?
-        writer.println(name + " " + gson.toJson(gameState));
+        writer.println(name + "\u00B1" + gson.toJson(gameState));
         do {
             if (clientStates.get("shouldSend")) {
                 serverGameState = gson.fromJson(readGameStateFromServer(), GameState.class);

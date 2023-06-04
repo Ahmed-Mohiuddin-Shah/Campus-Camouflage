@@ -87,7 +87,7 @@ public class Server implements Runnable {
         public void run() {
             try {
                 {
-                    String[] tempStrings = reader.readLine().split(" ");
+                    String[] tempStrings = reader.readLine().split("\u00B1");
                     clientName = tempStrings[0];
                     clientGameState = gson.fromJson(tempStrings[1], GameState.class);
                 }
