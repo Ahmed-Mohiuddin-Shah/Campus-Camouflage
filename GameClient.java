@@ -2,7 +2,6 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import com.google.gson.Gson;
 import com.threed.jpct.*;
 import com.threed.jpct.util.*;
 
