@@ -14,18 +14,26 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
     Client client;
 
+    int deltaX;
+    int deltaY;
+
+    int screenCenterX;
+    int screenCenterY;
+
+    Robot robot;
+
+    float toRadians = (float) Math.PI / 180;
+
     private static final float DAMPING = 0.1f;
 
     private static final float SPEED = 3f;
 
     private static final float MAXSPEED = 4f;
 
-    float mouseXRatio = 0;
-    float mouseYRatio = 0;
-
     private SimpleVector moveRes = new SimpleVector(0, 0, 0);
 
     private SimpleVector ellipsoid = new SimpleVector(5, 15, 5);
+    float playerHeight;
 
     private JFrame pauseFrame, gameFrame;
     JPanel panel1, panel2, panel3, panel4;
@@ -58,6 +66,9 @@ public class GameClient implements KeyListener, MouseMotionListener {
         this.name = name;
         this.ip = ip;
         this.port = port;
+
+        deltaX = 0;
+        deltaY = 0;
 
         Font helloHeadline = new Font("", Font.PLAIN, 0);
         try {
@@ -95,6 +106,14 @@ public class GameClient implements KeyListener, MouseMotionListener {
         gameFrame.setVisible(true);
         gameFrame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
 
+        screenCenterX = device.getFullScreenWindow().getWidth() / 2;
+        screenCenterY = device.getFullScreenWindow().getHeight() / 2;
+
+        try {
+            robot = new Robot(device);
+        } catch (AWTException e) {
+        }
+
         int maxWidth = 800;
         int maxHeight = 600;
         for (VideoMode vMode : FrameBuffer.getVideoModes(IRenderer.RENDERER_OPENGL)) {
@@ -106,9 +125,6 @@ public class GameClient implements KeyListener, MouseMotionListener {
             }
 
         }
-
-        mouseXRatio = maxWidth / device.getFullScreenWindow().getWidth();
-        mouseYRatio = maxHeight / device.getFullScreenWindow().getHeight();
 
         buffer = new FrameBuffer(maxWidth, maxHeight, FrameBuffer.SAMPLINGMODE_HARDWARE_ONLY);
         buffer.disableRenderer(IRenderer.RENDERER_SOFTWARE);
@@ -199,8 +215,12 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
             world.getCamera().align(player);
             world.getCamera().setPosition(player.getTransformedCenter());
-            world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, 100f);
-            world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, 20f);
+            world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, -10f);
+
+            playerHeight = player.getMesh().getBoundingBox()[3] - player.getMesh().getBoundingBox()[2];
+
+            world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, playerHeight / 4);
+
             buffer.clear(java.awt.Color.ORANGE);
             world.renderScene(buffer);
             world.draw(buffer);
@@ -313,10 +333,18 @@ public class GameClient implements KeyListener, MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
     }
 
+    int X;
+    int Y;
+
     @Override
     public void mouseMoved(MouseEvent e) {
-        mouseX = (int) (e.getX() * mouseXRatio);
-        mouseY = (int) (e.getY() * mouseYRatio);
+        X = e.getX();
+        Y = e.getY();
+        deltaX = ((mouseX / 2) - X) * 2;
+        deltaY = ((mouseY / 2) - Y) * 2;
+        mouseX = (int) (X * 2);
+        mouseY = (int) (Y * 2);
+        robot.mouseMove(screenCenterX, Y);
     }
 
     public void moveCamera() {
@@ -354,12 +382,20 @@ public class GameClient implements KeyListener, MouseMotionListener {
         }
 
         if (left) {
-            player.rotateY((float) Math.toRadians(-1));
+            SimpleVector t = player.getXAxis();
+            t.scalarMul(-SPEED);
+            moveRes.add(t);
         }
 
         if (right) {
-            player.rotateY((float) Math.toRadians(1));
+            SimpleVector t = player.getXAxis();
+            t.scalarMul(SPEED);
+            moveRes.add(t);
         }
+
+        player.rotateY(deltaX * toRadians);
+        deltaX = 0;
+        // deltaY = 0;
 
         // avoid high speeds
         if (moveRes.length() > MAXSPEED) {

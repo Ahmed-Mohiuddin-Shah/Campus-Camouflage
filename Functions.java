@@ -1,6 +1,11 @@
 import com.threed.jpct.*;
 import com.threed.jpct.util.*;
+
+import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.*;
+
+import javax.swing.JFrame;
 
 public class Functions {
     static KeyMapper keyMapper = new KeyMapper();
@@ -166,6 +171,17 @@ public class Functions {
             }
             return 0;
         }
+    }
+
+    public static void hideMouseCursor(JFrame frame) {
+        // Create a blank cursor
+        Cursor blankCursor = frame.getToolkit().createCustomCursor(
+                new java.awt.image.BufferedImage(1, 1, java.awt.image.BufferedImage.TYPE_INT_ARGB),
+                new Point(),
+                "Blank Cursor");
+
+        // Set the blank cursor to the frame's content pane
+        frame.getContentPane().setCursor(blankCursor);
     }
 
 }
