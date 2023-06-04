@@ -209,7 +209,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
             client.gameState.updatePosition(name, player.getTransformedCenter());
 
-            // world.getCamera().align(player);
+            world.getCamera().align(player);
             world.getCamera().setPosition(player.getTransformedCenter());
             world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, -10f);
 
@@ -389,7 +389,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
             moveRes.add(t);
         }
 
-        player.rotateY(deltaX * toRadians);
+        player.rotateY(deltaX * toRadians * 0.75f);
         deltaX = 0;
         // deltaY = 0;
 
