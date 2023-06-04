@@ -306,6 +306,9 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
             object3d.rotateX((float) -Math.PI / 2);
             object3d.rotateMesh();
             object3d.setRotationMatrix(new Matrix());
+            object3d.addCollisionListener(this);
+            object3d.enableCollisionListeners();
+            object3d.setCollisionOptimization(Object3D.COLLISION_DETECTION_OPTIMIZED);
             if (object3d.getName().contains("prp")) {
                 propArrayList.add(object3d);
             }
@@ -436,8 +439,11 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
             if (ce.getTargets()[0].getName().contains("prp")) {
                 System.out.println("RED");
                 mouseTargetTriangle.setAdditionalColor(Color.RED);
+                client.gameState.updateHitWhat(name, "prop");
             } else {
                 mouseTargetTriangle.setAdditionalColor(Color.BLUE);
+                
+                client.gameState.updateHitWhat(name, "notProp");
             }
         } else {
 
