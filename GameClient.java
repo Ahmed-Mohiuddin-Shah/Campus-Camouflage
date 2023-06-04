@@ -41,7 +41,7 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
     JTextArea serverLog, messageArea;
 
     Object3D player = null;
-    Object3D mouseTargetTriangle = Primitives.getPyramide(2f);
+    Object3D mouseTargetTriangle = Primitives.getCube(5f);
     Object3D[] map;
     Object3D[] props;
     World world;
@@ -65,6 +65,8 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
     String port;
 
     public GameClient(String ip, String port, String name) {
+        Config.collideOffset = 500f;
+
         this.name = name;
         this.ip = ip;
         this.port = port;
@@ -212,7 +214,7 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
         while (gameLoop) {
             mouseTargetTriangle.clearTranslation();
             mouseTargetTriangle.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
-            mouseTargetTriangle.checkForCollision(world.getCamera().getDirection(), 1);
+            mouseTargetTriangle.checkForCollision(world.getCamera().getDirection(), 20f);
             moveCamera();
 
             client.gameState.updatePosition(name, player.getTransformedCenter());
@@ -433,17 +435,12 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
     @Override
     public void collision(CollisionEvent ce) {
         if (ce.getObject().equals(mouseTargetTriangle)) {
-            for (Object3D object3d : ce.getTargets()) {
-                System.out.println(object3d.getName());
-            }
             if (ce.getTargets()[0].getName().contains("prp")) {
-                System.out.println("RED");
                 mouseTargetTriangle.setAdditionalColor(Color.RED);
-                client.gameState.updateHitWhat(name, "prop");
+                client.gameState.updateHitWhat(name, ce.getTargets()[0].getName());
             } else {
                 mouseTargetTriangle.setAdditionalColor(Color.BLUE);
-                
-                client.gameState.updateHitWhat(name, "notProp");
+                client.gameState.updateHitWhat(name, ce.getTargets()[0].getName());
             }
         } else {
 
