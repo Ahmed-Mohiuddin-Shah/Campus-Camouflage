@@ -9,7 +9,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 
-public class GameClient implements KeyListener, MouseMotionListener, CollisionListener {
+public class GameClient implements KeyListener, MouseListener, MouseMotionListener, CollisionListener {
     String name;
 
     Client client;
@@ -41,7 +41,8 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
     JTextArea serverLog, messageArea;
 
     Object3D player = null;
-    Object3D mouseTargetTriangle = Primitives.getCube(5f);
+    Object3D mouseTarget = Primitives.getSphere(3f);
+    String mouseWasOn = "non";
     Object3D[] map;
     Object3D[] props;
     World world;
@@ -188,9 +189,9 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
         pauseFrame.add(panel1);
 
         // Collision Listeners
-        mouseTargetTriangle.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
-        mouseTargetTriangle.addCollisionListener(this);
-        mouseTargetTriangle.enableCollisionListeners();
+        mouseTarget.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
+        mouseTarget.addCollisionListener(this);
+        mouseTarget.enableCollisionListeners();
 
         gameThread = new Thread(new GameLoop());
         gameThread.start();
@@ -198,8 +199,8 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
 
     private void init() {
         world = new World();
-        mouseTargetTriangle.build();
-        world.addObject(mouseTargetTriangle);
+        mouseTarget.build();
+        world.addObject(mouseTarget);
         loadMap(Functions.mapName);
     }
 
@@ -212,9 +213,9 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
         clientThread.start();
 
         while (gameLoop) {
-            mouseTargetTriangle.clearTranslation();
-            mouseTargetTriangle.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
-            mouseTargetTriangle.checkForCollision(world.getCamera().getDirection(), 20f);
+            mouseTarget.clearTranslation();
+            mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
+            mouseTarget.checkForCollision(world.getCamera().getDirection(), 20f);
             moveCamera();
 
             client.gameState.updatePosition(name, player.getTransformedCenter());
@@ -434,12 +435,13 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
 
     @Override
     public void collision(CollisionEvent ce) {
-        if (ce.getObject().equals(mouseTargetTriangle)) {
-            if (ce.getTargets()[0].getName().contains("prp")) {
-                mouseTargetTriangle.setAdditionalColor(Color.RED);
+        if (ce.getObject().equals(mouseTarget)) {
+            mouseWasOn = ce.getTargets()[0].getName();
+            if (mouseWasOn.contains("prp")) {
+                mouseTarget.setAdditionalColor(Color.RED);
                 client.gameState.updateHitWhat(name, ce.getTargets()[0].getName());
             } else {
-                mouseTargetTriangle.setAdditionalColor(Color.BLUE);
+                mouseTarget.setAdditionalColor(Color.BLUE);
                 client.gameState.updateHitWhat(name, ce.getTargets()[0].getName());
             }
         } else {
@@ -450,6 +452,43 @@ public class GameClient implements KeyListener, MouseMotionListener, CollisionLi
     @Override
     public boolean requiresPolygonIDs() {
         return false;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            if (mouseWasOn.contains("prp")) {
+                player.clearTranslation();
+
+                for (Object3D object3d : props) {
+                    if (object3d.getName().contains(mouseWasOn)) {
+                        client.gameState.updateCurrentModel(name, mouseWasOn);
+                        player = object3d.cloneObject();
+                        player.build();
+                        world.addObject(player);
+                        world.buildAllObjects();
+                        break;
+                    }
+                }
+
+            }
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
     }
 
 }
