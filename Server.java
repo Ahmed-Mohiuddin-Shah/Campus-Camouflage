@@ -109,6 +109,7 @@ public class Server implements Runnable {
                         addTextServerLog(textArea,
                                 serverGameState.playersInfo.get(clientName).get(3) + ", " + serverGameState.playersInfo
                                         .get(clientName).get(4));
+                                        count++;
                         count = 0;
                     }
                 } while (!recievedString.equals("bye"));
