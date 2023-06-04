@@ -7,6 +7,7 @@ import com.threed.jpct.util.*;
 
 import java.awt.event.*;
 import java.io.File;
+import java.util.ArrayList;
 
 public class GameClient implements KeyListener, MouseMotionListener {
     String name;
@@ -42,6 +43,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
     Object3D player = null;
     Object3D mouseTargetTriangle = Primitives.getPyramide(2f);
     Object3D[] map;
+    Object3D[] props;
     World world;
     FrameBuffer buffer;
     GraphicsDevice device;
@@ -279,8 +281,7 @@ public class GameClient implements KeyListener, MouseMotionListener {
     }
 
     public void loadMap(String mapName) {
-        // TODO Add props to props array
-
+        ArrayList<Object3D> propArrayList = new ArrayList<>();
         for (int i = 0; i < Functions.texturesJPG.length; ++i) {
 
             TextureManager.getInstance().addTexture(Functions.texturesJPG[i] + ".jpg",
@@ -292,15 +293,17 @@ public class GameClient implements KeyListener, MouseMotionListener {
                     new Texture("assets/textures/" + Functions.texturesPNG[i] + ".png"));
         }
 
-        map = Loader.load3DS("assets/map/" + mapName + ".3ds", 1f);
+        Object3D[] map = Loader.load3DS("assets/map/" + mapName + ".3ds", 1f);
 
         for (Object3D object3d : map) {
             object3d.setCenter(SimpleVector.ORIGIN);
             object3d.rotateX((float) -Math.PI / 2);
             object3d.rotateMesh();
             object3d.setRotationMatrix(new Matrix());
+            if (object3d.getName().contains("prp")) {
+                propArrayList.add(object3d);
+            }
             if (object3d.getName().contains("cop")) {
-                System.out.println("done");
                 player = object3d;
                 player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
                 world.addObject(player);
@@ -323,6 +326,8 @@ public class GameClient implements KeyListener, MouseMotionListener {
 
         world.setAmbientLight(20, 20, 20);
         world.buildAllObjects();
+
+        props = propArrayList.toArray(new Object3D[propArrayList.size()]);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.threed.jpct.util.*;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -41,8 +42,7 @@ public class Functions {
     }
 
     public static void loadMap(World world, String mapName, Object3D player, Object3D[] props) {
-        // TODO Add props to props array
-
+        ArrayList<Object3D> propArrayList = new ArrayList<>();
         for (int i = 0; i < texturesJPG.length; ++i) {
 
             TextureManager.getInstance().addTexture(texturesJPG[i] + ".jpg",
@@ -61,6 +61,9 @@ public class Functions {
             object3d.rotateX((float) -Math.PI / 2);
             object3d.rotateMesh();
             object3d.setRotationMatrix(new Matrix());
+            if (object3d.getName().contains("prp")) {
+                propArrayList.add(object3d);
+            }
             if (object3d.getName().contains("player")) {
                 player = object3d;
                 player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
@@ -84,6 +87,8 @@ public class Functions {
 
         world.setAmbientLight(20, 20, 20);
         world.buildAllObjects();
+
+        props = propArrayList.toArray(new Object3D[propArrayList.size()]);
     }
 
     public static void moveCamera(World world) {
