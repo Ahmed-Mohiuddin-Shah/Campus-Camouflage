@@ -15,7 +15,6 @@ public class Server implements Runnable, ItemListener {
     Gson gson;
 
     GameState serverGameState;
-    ConcurrentHashMap<String, GameState> clientGameStates;
 
     String gameStateString;
 
@@ -99,14 +98,12 @@ public class Server implements Runnable, ItemListener {
                 {
                     String[] tempStrings = reader.readLine().split("\u00B1");
                     clientName = tempStrings[0];
-                    clientGameStates.put(clientName, gson.fromJson(tempStrings[1], GameState.class));
+                    serverGameState.syncWithOtherGameStateExcludeOthers(clientName,
+                            gson.fromJson(tempStrings[1], GameState.class));
                 }
-                serverGameState.addNewPlayer(clientName, clientGameStates.get(clientName));
                 addTextServerLog(textArea, clientName + " just joined!");
-
                 addPlayerCheckbox(clientName);
 
-                serverGameState.syncWithOtherGameState(clientName, clientGameStates.get(clientName));
                 writer.println(gson.toJson(serverGameState));
                 int count = 0;
                 do {
@@ -115,14 +112,13 @@ public class Server implements Runnable, ItemListener {
                     if (recievedString.equals("bye") || recievedString.equals(null)) {
                         break;
                     }
-                    clientGameStates.put(clientName, gson.fromJson(recievedString, GameState.class));
-                    serverGameState.updatePlayer(clientName, clientGameStates.get(clientName));
+                    serverGameState.updatePlayer(clientName, gson.fromJson(recievedString, GameState.class));
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
 
                     if (count < 30) {
                         addTextServerLog(textArea,
-                                clientGameStates.get(clientName).playersInfo.get(clientName).get(2) + ", "
+                                serverGameState.playersInfo.get(clientName).get(2) + ", "
                                         + serverGameState.playersInfo
                                                 .get(clientName).get(4));
                         count++;
@@ -149,7 +145,6 @@ public class Server implements Runnable, ItemListener {
 
     private void init(String ip, String port) {
         playerCheckBoxes = new ArrayList<>();
-        clientGameStates = new ConcurrentHashMap<>();
 
         gson = new Gson();
 
@@ -243,10 +238,10 @@ public class Server implements Runnable, ItemListener {
         JButton startButton = new JButton("Start/Reset");
         startButton.setFont(helloHeadline);
         startButton.addActionListener(e -> {
-            for (String nameString : clientGameStates.keySet()) {
+            for (String nameString : serverGameState.playersInfo.keySet()) {
                 for (JCheckBox jCheckBox : playerCheckBoxes) {
                     if (jCheckBox.getText().equals(nameString)) {
-                        clientGameStates.get(jCheckBox.getText()).resetPlayer(nameString,
+                        serverGameState.resetPlayer(nameString,
                                 jCheckBox.isSelected() ? "seeker" : "hider");
                     }
                 }
@@ -308,13 +303,13 @@ public class Server implements Runnable, ItemListener {
         if (e.getStateChange() == ItemEvent.SELECTED) {
             for (JCheckBox jCheckBox : playerCheckBoxes) {
                 if (e.getSource().equals(jCheckBox)) {
-                    clientGameStates.get(jCheckBox.getText()).updateStatus(jCheckBox.getText(), "seeker");
+                    serverGameState.updateStatus(jCheckBox.getText(), "seeker");
                 }
             }
         } else {
             for (JCheckBox jCheckBox : playerCheckBoxes) {
                 if (e.getSource().equals(jCheckBox)) {
-                    clientGameStates.get(jCheckBox.getText()).updateStatus(jCheckBox.getText(), "hider");
+                    serverGameState.updateStatus(jCheckBox.getText(), "hider");
                 }
             }
         }

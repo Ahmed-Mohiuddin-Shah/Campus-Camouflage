@@ -74,4 +74,13 @@ public class GameState {
             }
         }
     }
+
+    public void syncWithOtherGameStateExcludeOthers(String name, GameState gameState) {
+        for (String keyID : gameState.playersInfo.keySet()) {
+            if (keyID.equals(name)) {
+                playersInfo.put(keyID, gameState.playersInfo.get(keyID));
+                break;
+            }
+        }
+    }
 }
