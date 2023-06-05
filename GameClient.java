@@ -250,11 +250,17 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             world.renderScene(buffer);
             world.draw(buffer);
             buffer.update();
-            glFont.blitString(buffer,
-                    "Status: " + client.gameState.playersInfo.get(name).get(2) + " " + "Health: "
-                            + client.gameState.playersInfo.get(name).get(5),
-                    10,
-                    30, 150, Color.BLACK);
+            try {
+                {
+                    glFont.blitString(buffer,
+                            "Status: " + client.serverGameState.playersInfo.get(name).get(2) + " " + "Health: "
+                                    + client.serverGameState.playersInfo.get(name).get(5),
+                            10,
+                            30, 150, Color.BLACK);
+                }
+
+            } catch (Exception e) {
+            }
             buffer.display(canvas.getGraphics());
             canvas.repaint();
             try {
@@ -262,7 +268,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             } catch (InterruptedException e) {
 
             }
-            
+
             client.sendGameState();
         }
         client.closeClient();

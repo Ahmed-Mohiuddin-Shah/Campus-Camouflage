@@ -4,6 +4,7 @@ import java.awt.event.ItemListener;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalIconFactory.PaletteCloseIcon;
@@ -14,6 +15,7 @@ public class Server implements Runnable, ItemListener {
     Gson gson;
 
     GameState serverGameState;
+    ConcurrentHashMap<String, GameState> clientGameStates;
 
     String gameStateString;
 
@@ -79,7 +81,6 @@ public class Server implements Runnable, ItemListener {
         private String clientName;
         private BufferedReader reader;
         private PrintWriter writer;
-        private GameState clientGameState;
 
         public ServerThread(Socket socket) {
             this.socket = socket;
@@ -98,14 +99,14 @@ public class Server implements Runnable, ItemListener {
                 {
                     String[] tempStrings = reader.readLine().split("\u00B1");
                     clientName = tempStrings[0];
-                    clientGameState = gson.fromJson(tempStrings[1], GameState.class);
+                    clientGameStates.put(clientName, gson.fromJson(tempStrings[1], GameState.class));
                 }
-                serverGameState.addNewPlayer(clientName, clientGameState);
+                serverGameState.addNewPlayer(clientName, clientGameStates.get(clientName));
                 addTextServerLog(textArea, clientName + " just joined!");
 
                 addPlayerCheckbox(clientName);
 
-                serverGameState.syncWithOtherGameState(clientName, clientGameState);
+                serverGameState.syncWithOtherGameState(clientName, clientGameStates.get(clientName));
                 writer.println(gson.toJson(serverGameState));
                 int count = 0;
                 do {
@@ -114,8 +115,8 @@ public class Server implements Runnable, ItemListener {
                     if (recievedString.equals("bye") || recievedString.equals(null)) {
                         break;
                     }
-                    clientGameState = gson.fromJson(recievedString, GameState.class);
-                    serverGameState.updatePlayer(clientName, clientGameState);
+                    clientGameStates.put(clientName, gson.fromJson(recievedString, GameState.class));
+                    serverGameState.updatePlayer(clientName, clientGameStates.get(clientName));
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
 
@@ -124,7 +125,6 @@ public class Server implements Runnable, ItemListener {
                                 serverGameState.playersInfo.get(clientName).get(3) + ", " + serverGameState.playersInfo
                                         .get(clientName).get(4));
                         count++;
-                        ;
                     } else {
                         count = 0;
                     }
@@ -241,10 +241,11 @@ public class Server implements Runnable, ItemListener {
         JButton startButton = new JButton("Start/Reset");
         startButton.setFont(helloHeadline);
         startButton.addActionListener(e -> {
-            for (String nameString : serverGameState.playersInfo.keySet()) {
+            for (String nameString : clientGameStates.keySet()) {
                 for (JCheckBox jCheckBox : playerCheckBoxes) {
                     if (jCheckBox.getText().equals(nameString)) {
-                        serverGameState.resetPlayer(nameString, jCheckBox.isSelected() ? "seeker" : "hider");
+                        clientGameStates.get(jCheckBox.getText()).resetPlayer(nameString,
+                                jCheckBox.isSelected() ? "seeker" : "hider");
                     }
                 }
 
@@ -305,13 +306,13 @@ public class Server implements Runnable, ItemListener {
         if (e.getStateChange() == ItemEvent.SELECTED) {
             for (JCheckBox jCheckBox : playerCheckBoxes) {
                 if (e.getSource().equals(jCheckBox)) {
-                    serverGameState.updateStatus(jCheckBox.getText(), "seeker");
+                    clientGameStates.get(jCheckBox.getText()).updateStatus(jCheckBox.getText(), "seeker");
                 }
             }
         } else {
             for (JCheckBox jCheckBox : playerCheckBoxes) {
                 if (e.getSource().equals(jCheckBox)) {
-                    serverGameState.updateStatus(jCheckBox.getText(), "hider");
+                    clientGameStates.get(jCheckBox.getText()).updateStatus(jCheckBox.getText(), "hider");
                 }
             }
         }
