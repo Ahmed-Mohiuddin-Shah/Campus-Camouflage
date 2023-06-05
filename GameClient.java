@@ -8,6 +8,7 @@ import com.threed.jpct.util.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GameClient implements KeyListener, MouseListener, MouseMotionListener, CollisionListener {
     String name;
@@ -67,8 +68,12 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
     String ip;
     String port;
 
+    ArrayList<Object3D> serverPlayersModels;
+
     public GameClient(String ip, String port, String name) {
         Config.collideOffset = 500f;
+
+        serverPlayersModels = new ArrayList<>();
 
         this.name = name;
         this.ip = ip;
@@ -224,7 +229,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
         while (gameLoop) {
             mouseTarget.clearTranslation();
             mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
-            mouseTarget.translate(1, 1, 1);
+            mouseTarget.translate(1, 1, -1);
             mouseTarget.checkForCollision(world.getCamera().getDirection(), 20f);
             moveCamera();
 
@@ -245,7 +250,11 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             world.renderScene(buffer);
             world.draw(buffer);
             buffer.update();
-            glFont.blitString(buffer, "Status: " + " " + "Health: " + 100, 10, 30, 150, Color.BLACK);
+            glFont.blitString(buffer,
+                    "Status: " + client.gameState.playersInfo.get(name).get(2) + " " + "Health: "
+                            + client.gameState.playersInfo.get(name).get(5),
+                    10,
+                    30, 150, Color.BLACK);
             buffer.display(canvas.getGraphics());
             canvas.repaint();
             try {
@@ -253,6 +262,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             } catch (InterruptedException e) {
 
             }
+            
             client.sendGameState();
         }
         client.closeClient();

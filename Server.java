@@ -105,6 +105,7 @@ public class Server implements Runnable, ItemListener {
 
                 addPlayerCheckbox(clientName);
 
+                serverGameState.syncWithOtherGameState(clientName, clientGameState);
                 writer.println(gson.toJson(serverGameState));
                 int count = 0;
                 do {
@@ -123,6 +124,8 @@ public class Server implements Runnable, ItemListener {
                                 serverGameState.playersInfo.get(clientName).get(3) + ", " + serverGameState.playersInfo
                                         .get(clientName).get(4));
                         count++;
+                        ;
+                    } else {
                         count = 0;
                     }
                 } while (!recievedString.equals("bye"));
@@ -241,10 +244,10 @@ public class Server implements Runnable, ItemListener {
             for (String nameString : serverGameState.playersInfo.keySet()) {
                 for (JCheckBox jCheckBox : playerCheckBoxes) {
                     if (jCheckBox.getText().equals(nameString)) {
-                        serverGameState.resetPlayer(nameString, jCheckBox.isSelected()?"seeker":"hider");
+                        serverGameState.resetPlayer(nameString, jCheckBox.isSelected() ? "seeker" : "hider");
                     }
                 }
-                
+
             }
         });
 
