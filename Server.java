@@ -285,6 +285,7 @@ public class Server implements Runnable, ItemListener {
         playerCheckBoxes.add(0, new JCheckBox(clientName));
         playerStatusEditorPanel.add(playerCheckBoxes.get(0));
         playerCheckBoxes.get(0).addItemListener(this);
+        playerStatusEditorPanel.repaint();
     }
 
     @Override
@@ -305,10 +306,12 @@ public class Server implements Runnable, ItemListener {
     }
 
     public void removeCheckbox(String clientName) {
-        for (JCheckBox jCheckBox : playerCheckBoxes) {
-            if (jCheckBox.getText().equals(clientName)) {
-                playerStatusEditorPanel.remove(jCheckBox);
+        for (int i = 0; i < playerCheckBoxes.size(); i++) {
+            if (playerCheckBoxes.get(i).getText().equals(clientName)) {
+                playerStatusEditorPanel.remove(playerCheckBoxes.get(i));
+                playerCheckBoxes.remove(i);
             }
         }
+        playerStatusEditorPanel.repaint();
     }
 }
