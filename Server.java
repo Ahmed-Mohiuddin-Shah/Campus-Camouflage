@@ -130,6 +130,8 @@ public class Server implements Runnable, ItemListener {
                         clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));
                 socket.close();
                 removeCheckbox(clientName);
+
+                playerStatusEditorPanel.validate();
                 serverGameState.removePlayer(clientName);
             } catch (IOException | ArrayIndexOutOfBoundsException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
@@ -285,7 +287,7 @@ public class Server implements Runnable, ItemListener {
         playerCheckBoxes.add(0, new JCheckBox(clientName));
         playerStatusEditorPanel.add(playerCheckBoxes.get(0));
         playerCheckBoxes.get(0).addItemListener(this);
-        playerStatusEditorPanel.repaint();
+        playerStatusEditorPanel.validate();
     }
 
     @Override
@@ -312,6 +314,6 @@ public class Server implements Runnable, ItemListener {
                 playerCheckBoxes.remove(i);
             }
         }
-        playerStatusEditorPanel.repaint();
+        playerStatusEditorPanel.validate();
     }
 }
