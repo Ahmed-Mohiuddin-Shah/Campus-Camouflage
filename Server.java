@@ -122,8 +122,9 @@ public class Server implements Runnable, ItemListener {
 
                     if (count < 30) {
                         addTextServerLog(textArea,
-                                serverGameState.playersInfo.get(clientName).get(3) + ", " + serverGameState.playersInfo
-                                        .get(clientName).get(4));
+                                clientGameStates.get(clientName).playersInfo.get(clientName).get(2) + ", "
+                                        + serverGameState.playersInfo
+                                                .get(clientName).get(4));
                         count++;
                     } else {
                         count = 0;
@@ -148,6 +149,7 @@ public class Server implements Runnable, ItemListener {
 
     private void init(String ip, String port) {
         playerCheckBoxes = new ArrayList<>();
+        clientGameStates = new ConcurrentHashMap<>();
 
         gson = new Gson();
 
