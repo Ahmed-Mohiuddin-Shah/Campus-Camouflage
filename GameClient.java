@@ -217,7 +217,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
     }
 
     private void gameLoop() {
-        Object3D cop;
+        Object3D cop = null;
         for (Object3D object3d : map) {
             if (object3d.getName().contains("cop")) {
                 cop = object3d;
@@ -232,12 +232,36 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
         world.getCamera().setEllipsoidMode(Camera.ELLIPSOID_TRANSFORMED);
 
         while (!client.serverReady.equals("end")) {
+            
             while (client.serverReady.equals("no")) {
-                System.out.println(client.gameState.playersInfo.toString());
                 client.sendGameState();
             }
 
             // Initialize code
+            serverPlayersModels = new ArrayList<>(client.gameState.getNumOfPlayersOnServer());
+
+            for (String keyID : client.gameState.playersInfo.keySet()) {
+                ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
+                Object3D assignModel = cop.cloneObject();
+                if (playerServerInfo.get(2).equals("hider")) {
+                    for (Object3D object3d : props) {
+                        if (object3d.getName().contains(playerServerInfo.get(4))) {
+                            assignModel = object3d.cloneObject();
+                            break;
+                        }
+                    }
+                } else {
+                    assignModel = cop.cloneObject();
+                }
+                assignModel.setName(assignModel.getName().split("_jPCT")[0] + "\u00B1"+playerServerInfo.get(0));
+                assignModel.clearTranslation();
+                assignModel.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
+                assignModel.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
+                assignModel.setCollisionOptimization(true);
+                assignModel.build();
+                world.addObject(assignModel);
+                serverPlayersModels.add(assignModel);
+            }
 
             init();
             client.gameState.removePlayer(name);
@@ -245,6 +269,14 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                     player.getName(), "100");
 
             while (client.serverReady.equals("yes")) {
+
+                //While assuming no model change
+                for (Object3D object3d : serverPlayersModels) {
+                    object3d.clearTranslation();
+                    object3d.translate(Functions.stringToSimpleVector(client.gameState.playersInfo.get(object3d.getName().split(
+                            "\u00B1")[1]).get(1)));
+                }
+
                 mouseTarget.clearTranslation();
                 mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
                 mouseTarget.translate(1, 1, -1);
