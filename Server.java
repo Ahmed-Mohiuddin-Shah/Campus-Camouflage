@@ -237,7 +237,16 @@ public class Server implements Runnable, ItemListener {
 
         JButton startButton = new JButton("Start/Reset");
         startButton.setFont(helloHeadline);
-        // TODO
+        startButton.addActionListener(e -> {
+            for (String nameString : serverGameState.playersInfo.keySet()) {
+                for (JCheckBox jCheckBox : playerCheckBoxes) {
+                    if (jCheckBox.getText().equals(nameString)) {
+                        serverGameState.resetPlayer(nameString, jCheckBox.isSelected()?"seeker":"hider");
+                    }
+                }
+                
+            }
+        });
 
         textArea = new JTextArea(30, 100);
         textArea.setText("      ");

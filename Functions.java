@@ -31,6 +31,8 @@ public class Functions {
 
     static String mapName = "testMap";
 
+    static SimpleVector homePosition = new SimpleVector(150, 15, -180);
+
     public static String simpleVectorToString(SimpleVector simpleVector) {
         return simpleVector.x + "," + simpleVector.y + "," + simpleVector.z;
     }

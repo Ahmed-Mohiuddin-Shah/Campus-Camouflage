@@ -215,7 +215,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
         client = new Client(ip, port, name);
         client.gameState.addNewPlayer(name, player.getTransformedCenter(), "non", "non",
-                player.getName(), "hider", "100");
+                player.getName(), "100");
         clientThread = new Thread(client);
         clientThread.start();
 

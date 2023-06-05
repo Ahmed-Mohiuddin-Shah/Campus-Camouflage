@@ -12,14 +12,13 @@ public class GameState {
     }
 
     public void addNewPlayer(String name, SimpleVector playerPosition, String status, String hitWhat,
-            String currentModel, String currentRank, String currentHealth) {
+            String currentModel, String currentHealth) {
         ArrayList<String> playerInfo = new ArrayList<>(5);
         playerInfo.add(name);
         playerInfo.add(Functions.simpleVectorToString(playerPosition));
         playerInfo.add(status);
         playerInfo.add(hitWhat);
         playerInfo.add(currentModel);
-        playerInfo.add(currentRank);
         playerInfo.add(currentHealth);
         playersInfo.put(name, playerInfo);
     }
@@ -33,8 +32,8 @@ public class GameState {
     }
 
     public void updatePosition(String name, SimpleVector playerPosition) {
-            playersInfo.get(name).set(1, Functions.simpleVectorToString(playerPosition));
-        
+        playersInfo.get(name).set(1, Functions.simpleVectorToString(playerPosition));
+
     }
 
     public void updateStatus(String name, String status) {
@@ -49,16 +48,23 @@ public class GameState {
         playersInfo.get(name).set(4, currentModel);
     }
 
-    public void updateCurrentRank(String name, String currentRank) {
-        playersInfo.get(name).set(5, currentRank);
-    }
-
     public void updateCurrentHealth(String name, String currentHealth) {
         playersInfo.get(name).set(6, currentHealth);
     }
 
     public void updatePlayer(String name, GameState clientGameState) {
         playersInfo.put(name, clientGameState.playersInfo.get(name));
+    }
+
+    public void resetPlayer(String name, String status) {
+        ArrayList<String> playerInfo = new ArrayList<>(5);
+        playerInfo.add(name);
+        playerInfo.add(Functions.simpleVectorToString(Functions.homePosition));
+        playerInfo.add(status);
+        playerInfo.add("non");
+        playerInfo.add(status.equals("hider") ? "hider" : "cop");
+        playerInfo.add("100");
+        playersInfo.put(name, playerInfo);
     }
 
     public void syncWithOtherGameState(String excludeName, GameState gameState) {
