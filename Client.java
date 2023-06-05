@@ -16,6 +16,8 @@ public class Client implements Runnable {
 
     boolean stopClient;
 
+    String serverReady;
+
     private BufferedReader reader;
     private PrintWriter writer;
 
@@ -29,6 +31,8 @@ public class Client implements Runnable {
         gson = new Gson();
         gameState = new GameState();
         serverGameState = new GameState();
+
+        serverReady = "no";
 
         try {
             socket = new Socket(ip, Integer.parseInt(port));
@@ -51,9 +55,13 @@ public class Client implements Runnable {
     public String readGameStateFromServer() {
         String s = gson.toJson(gameState);
         try {
-            s = reader.readLine();
+            String[] sArray;
+            sArray = reader.readLine().split("\u00B1");
+            serverReady = sArray[0];
+            s = sArray[1];
         } catch (IOException e) {
         }
+
         return s;
     }
 
@@ -69,7 +77,7 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
-        //TODO What if server disconnects?
+        // TODO What if server disconnects?
         writer.println(name + "\u00B1" + gson.toJson(gameState));
         do {
             if (clientStates.get("shouldSend")) {

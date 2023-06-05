@@ -49,7 +49,7 @@ public class GameState {
     }
 
     public void updateCurrentHealth(String name, String currentHealth) {
-        playersInfo.get(name).set(6, currentHealth);
+        playersInfo.get(name).set(5, currentHealth);
     }
 
     public void updatePlayer(String name, GameState clientGameState) {

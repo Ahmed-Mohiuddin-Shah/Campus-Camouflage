@@ -4,15 +4,13 @@ import java.awt.event.ItemListener;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalIconFactory.PaletteCloseIcon;
-
 import com.google.gson.Gson;
 
 public class Server implements Runnable, ItemListener {
     Gson gson;
+
+    String serverReady;
 
     GameState serverGameState;
 
@@ -104,7 +102,7 @@ public class Server implements Runnable, ItemListener {
                 addTextServerLog(textArea, clientName + " just joined!");
                 addPlayerCheckbox(clientName);
 
-                writer.println(gson.toJson(serverGameState));
+                writer.println(serverReady + "\u00B1" + gson.toJson(serverGameState));
                 int count = 0;
                 GameState clientState;
                 do {
@@ -116,8 +114,9 @@ public class Server implements Runnable, ItemListener {
                     clientState = gson.fromJson(recievedString, GameState.class);
                     serverGameState.updatePosition(clientName, Functions.stringToSimpleVector(
                             clientState.playersInfo.get(clientName).get(1)));
+                    serverGameState.updateCurrentHealth(clientName, clientState.playersInfo.get(clientName).get(5));
 
-                    gameStateString = gson.toJson(serverGameState);
+                    gameStateString = serverReady + "\u00B1" + gson.toJson(serverGameState);
                     writer.println(gameStateString);
 
                     if (count < 30) {
@@ -148,6 +147,8 @@ public class Server implements Runnable, ItemListener {
     }
 
     private void init(String ip, String port) {
+        serverReady = "no";
+
         playerCheckBoxes = new ArrayList<>();
 
         gson = new Gson();
@@ -226,6 +227,7 @@ public class Server implements Runnable, ItemListener {
                 timer.setRepeats(false);
                 timer.start();
             } else {
+                serverReady = "end";
                 frame.dispose();
                 try {
                     server.close();
@@ -239,18 +241,27 @@ public class Server implements Runnable, ItemListener {
 
         closeServer.setFont(helloHeadline);
 
-        JButton startButton = new JButton("Start/Reset");
+        JButton startButton = new JButton("Start");
         startButton.setFont(helloHeadline);
         startButton.addActionListener(e -> {
-            for (String nameString : serverGameState.playersInfo.keySet()) {
-                for (JCheckBox jCheckBox : playerCheckBoxes) {
-                    if (jCheckBox.getText().equals(nameString)) {
-                        serverGameState.resetPlayer(nameString,
-                                jCheckBox.isSelected() ? "seeker" : "hider");
-                    }
-                }
 
+            if (startButton.getText().equals("Start")) {
+                for (String nameString : serverGameState.playersInfo.keySet()) {
+                    for (JCheckBox jCheckBox : playerCheckBoxes) {
+                        if (jCheckBox.getText().equals(nameString)) {
+                            serverGameState.resetPlayer(nameString,
+                                    jCheckBox.isSelected() ? "seeker" : "hider");
+                        }
+                    }
+
+                }
+                serverReady = "yes";
+                startButton.setText("Reset");
+            } else {
+                serverReady = "no";
+                startButton.setText("Start");
             }
+
         });
 
         textArea = new JTextArea(30, 100);

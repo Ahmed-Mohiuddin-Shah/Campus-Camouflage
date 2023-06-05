@@ -217,7 +217,12 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
     }
 
     private void gameLoop() {
-
+        Object3D cop;
+        for (Object3D object3d : map) {
+            if (object3d.getName().contains("cop")) {
+                cop = object3d;
+            }
+        }
         client = new Client(ip, port, name);
         client.gameState.addNewPlayer(name, player.getTransformedCenter(), "hider", "non",
                 player.getName(), "100");
@@ -226,50 +231,64 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
         world.getCamera().setEllipsoidMode(Camera.ELLIPSOID_TRANSFORMED);
 
-        while (gameLoop) {
-            mouseTarget.clearTranslation();
-            mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
-            mouseTarget.translate(1, 1, -1);
-            mouseTarget.checkForCollision(world.getCamera().getDirection(), 20f);
-            moveCamera();
+        while (!client.serverReady.equals("end")) {
+            while (client.serverReady.equals("no")) {
+                System.out.println(client.gameState.playersInfo.toString());
+                client.sendGameState();
+            }
 
-            client.gameState.updatePosition(name, player.getTransformedCenter());
+            // Initialize code
 
-            world.getCamera().align(player);
-            world.getCamera().setPosition(player.getTransformedCenter());
-            // world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, -10f);
+            init();
+            client.gameState.removePlayer(name);
+            client.gameState.addNewPlayer(name, player.getTransformedCenter(), "hider", "non",
+                    player.getName(), "100");
 
-            // playerHeight = player.getMesh().getBoundingBox()[3] -
-            // player.getMesh().getBoundingBox()[2];
+            while (client.serverReady.equals("yes")) {
+                mouseTarget.clearTranslation();
+                mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
+                mouseTarget.translate(1, 1, -1);
+                mouseTarget.checkForCollision(world.getCamera().getDirection(), 20f);
+                moveCamera();
 
-            // world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, playerHeight / 4);
-            world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, 100f);
-            world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, 20f);
+                client.gameState.updatePosition(name, player.getTransformedCenter());
 
-            buffer.clear(java.awt.Color.ORANGE);
-            world.renderScene(buffer);
-            world.draw(buffer);
-            buffer.update();
-            try {
-                {
-                    glFont.blitString(buffer,
-                            "Status: " + client.serverGameState.playersInfo.get(name).get(2) + " " + "Health: "
-                                    + client.serverGameState.playersInfo.get(name).get(5),
-                            10,
-                            30, 150, Color.BLACK);
+                world.getCamera().align(player);
+                world.getCamera().setPosition(player.getTransformedCenter());
+                // world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, -10f);
+
+                // playerHeight = player.getMesh().getBoundingBox()[3] -
+                // player.getMesh().getBoundingBox()[2];
+
+                // world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, playerHeight / 4);
+                world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, 100f);
+                world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, 20f);
+
+                buffer.clear(java.awt.Color.ORANGE);
+                world.renderScene(buffer);
+                world.draw(buffer);
+                buffer.update();
+                try {
+                    {
+                        glFont.blitString(buffer,
+                                "Status: " + client.serverGameState.playersInfo.get(name).get(2) + " " + "Health: "
+                                        + client.serverGameState.playersInfo.get(name).get(5),
+                                10,
+                                30, 150, Color.BLACK);
+                    }
+
+                } catch (Exception e) {
+                }
+                buffer.display(canvas.getGraphics());
+                canvas.repaint();
+                try {
+                    Thread.sleep(15);
+                } catch (InterruptedException e) {
+
                 }
 
-            } catch (Exception e) {
+                client.sendGameState();
             }
-            buffer.display(canvas.getGraphics());
-            canvas.repaint();
-            try {
-                Thread.sleep(15);
-            } catch (InterruptedException e) {
-
-            }
-
-            client.sendGameState();
         }
         client.closeClient();
     }
@@ -332,7 +351,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                     new Texture("assets/textures/" + Functions.texturesPNG[i] + ".png"));
         }
 
-        Object3D[] map = Loader.load3DS("assets/map/" + mapName + ".3ds", 1f);
+        map = Loader.load3DS("assets/map/" + mapName + ".3ds", 1f);
 
         for (Object3D object3d : map) {
             object3d.setCenter(SimpleVector.ORIGIN);
@@ -485,21 +504,24 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (mouseWasOn.contains("prp")) {
-                for (Object3D object3d : props) {
-                    if (object3d.getName().contains(mouseWasOn)) {
-                        changePlayerModel(object3d);
-                        break;
+            if (client.serverGameState.playersInfo.get(name).get(2).equals("hider")) {
+                if (mouseWasOn.contains("prp")) {
+                    for (Object3D object3d : props) {
+                        if (object3d.getName().contains(mouseWasOn)) {
+                            changePlayerModel(object3d);
+                            break;
+                        }
                     }
                 }
+            } else {
+                client.serverGameState.updateHitWhat(name,
+                        mouseWasOn);
+                client.serverGameState.updateCurrentHealth(name,
+                        Integer.toString(Integer.parseInt(client.gameState.playersInfo.get(name).get(5)) - 1));
+                client.gameState.updateCurrentHealth(name,
+                        Integer.toString(Integer.parseInt(client.gameState.playersInfo.get(name).get(5)) - 1));
+
             }
-        }
-        if (e.getButton() == MouseEvent.BUTTON3) {
-            client.gameState.updateHitWhat(name,
-                    mouseWasOn + "\u00B1" + Functions.simpleVectorToString(player.getTransformedCenter()));
-        } else {
-            client.gameState.updateHitWhat(name,
-                    "non");
         }
     }
 
