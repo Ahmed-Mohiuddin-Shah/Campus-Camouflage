@@ -106,13 +106,17 @@ public class Server implements Runnable, ItemListener {
 
                 writer.println(gson.toJson(serverGameState));
                 int count = 0;
+                GameState clientState;
                 do {
 
                     recievedString = reader.readLine();
                     if (recievedString.equals("bye") || recievedString.equals(null)) {
                         break;
                     }
-                    serverGameState.updatePlayer(clientName, gson.fromJson(recievedString, GameState.class));
+                    clientState = gson.fromJson(recievedString, GameState.class);
+                    serverGameState.updatePosition(clientName, Functions.stringToSimpleVector(
+                            clientState.playersInfo.get(clientName).get(1)));
+
                     gameStateString = gson.toJson(serverGameState);
                     writer.println(gameStateString);
 
