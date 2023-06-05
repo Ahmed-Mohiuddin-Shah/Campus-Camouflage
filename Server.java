@@ -1,11 +1,16 @@
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalIconFactory.PaletteCloseIcon;
 
 import com.google.gson.Gson;
 
-public class Server implements Runnable {
+public class Server implements Runnable, ItemListener {
     Gson gson;
 
     GameState serverGameState;
@@ -23,6 +28,10 @@ public class Server implements Runnable {
     private JTextArea textArea;
 
     static JButton backButton = new JButton("Main Menu");
+
+    JPanel playerStatusEditorPanel;
+
+    ArrayList<JCheckBox> playerCheckBoxes;
 
     Server() {
         this("6000");
@@ -93,10 +102,13 @@ public class Server implements Runnable {
                 }
                 serverGameState.addNewPlayer(clientName, clientGameState);
                 addTextServerLog(textArea, clientName + " just joined!");
+
+                addPlayerCheckbox(clientName);
+
                 writer.println(gson.toJson(serverGameState));
                 int count = 0;
                 do {
-                    
+
                     recievedString = reader.readLine();
                     if (recievedString.equals("bye") || recievedString.equals(null)) {
                         break;
@@ -110,13 +122,14 @@ public class Server implements Runnable {
                         addTextServerLog(textArea,
                                 serverGameState.playersInfo.get(clientName).get(3) + ", " + serverGameState.playersInfo
                                         .get(clientName).get(4));
-                                        count++;
+                        count++;
                         count = 0;
                     }
                 } while (!recievedString.equals("bye"));
                 addTextServerLog(textArea,
                         clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));
                 socket.close();
+                removeCheckbox(clientName);
                 serverGameState.removePlayer(clientName);
             } catch (IOException | ArrayIndexOutOfBoundsException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
@@ -131,6 +144,7 @@ public class Server implements Runnable {
     }
 
     private void init(String ip, String port) {
+        playerCheckBoxes = new ArrayList<>();
 
         gson = new Gson();
 
@@ -221,6 +235,10 @@ public class Server implements Runnable {
 
         closeServer.setFont(helloHeadline);
 
+        JButton startButton = new JButton("Start/Reset");
+        startButton.setFont(helloHeadline);
+        // TODO
+
         textArea = new JTextArea(30, 100);
         textArea.setText("      ");
         textArea.setAutoscrolls(true);
@@ -231,12 +249,26 @@ public class Server implements Runnable {
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setAutoscrolls(true);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 1));
+        buttonPanel.add(startButton);
         buttonPanel.add(backButton);
         buttonPanel.add(closeServer);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new GridLayout(1, 2));
+        bottomPanel.add(buttonPanel);
+
+        playerStatusEditorPanel = new JPanel();
+        FlowLayout fL = new FlowLayout();
+        fL.setAlignment(FlowLayout.LEFT);
+        playerStatusEditorPanel.setLayout(fL);
+        playerStatusEditorPanel.add(new JLabel("Check Players to make Seekers!"));
+
+        bottomPanel.add(playerStatusEditorPanel);
+
         frame.setLayout(new GridLayout(2, 1));
         frame.add(scrollPane);
-        frame.add(buttonPanel);
+        frame.add(bottomPanel);
         frame.pack();
         frame.setVisible(true);
 
@@ -249,4 +281,34 @@ public class Server implements Runnable {
         frame.setSize(device.getFullScreenWindow().getWidth(), device.getFullScreenWindow().getHeight());
     }
 
+    public void addPlayerCheckbox(String clientName) {
+        playerCheckBoxes.add(0, new JCheckBox(clientName));
+        playerStatusEditorPanel.add(playerCheckBoxes.get(0));
+        playerCheckBoxes.get(0).addItemListener(this);
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            for (JCheckBox jCheckBox : playerCheckBoxes) {
+                if (e.getSource().equals(jCheckBox)) {
+                    serverGameState.updateStatus(jCheckBox.getText(), "seeker");
+                }
+            }
+        } else {
+            for (JCheckBox jCheckBox : playerCheckBoxes) {
+                if (e.getSource().equals(jCheckBox)) {
+                    serverGameState.updateStatus(jCheckBox.getText(), "hider");
+                }
+            }
+        }
+    }
+
+    public void removeCheckbox(String clientName) {
+        for (JCheckBox jCheckBox : playerCheckBoxes) {
+            if (jCheckBox.getText().equals(clientName)) {
+                playerStatusEditorPanel.remove(jCheckBox);
+            }
+        }
+    }
 }
