@@ -94,8 +94,9 @@ public class Server implements Runnable {
                 serverGameState.addNewPlayer(clientName, clientGameState);
                 addTextServerLog(textArea, clientName + " just joined!");
                 writer.println(gson.toJson(serverGameState));
+                int count = 0;
                 do {
-                    int count = 0;
+                    
                     recievedString = reader.readLine();
                     if (recievedString.equals("bye") || recievedString.equals(null)) {
                         break;

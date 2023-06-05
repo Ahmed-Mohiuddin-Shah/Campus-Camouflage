@@ -12,7 +12,7 @@ public class GameState {
     }
 
     public void addNewPlayer(String name, SimpleVector playerPosition, String status, String hitWhat,
-            String currentModel, String currentRank) {
+            String currentModel, String currentRank, String currentHealth) {
         ArrayList<String> playerInfo = new ArrayList<>(5);
         playerInfo.add(name);
         playerInfo.add(Functions.simpleVectorToString(playerPosition));
@@ -20,6 +20,7 @@ public class GameState {
         playerInfo.add(hitWhat);
         playerInfo.add(currentModel);
         playerInfo.add(currentRank);
+        playerInfo.add(currentHealth);
         playersInfo.put(name, playerInfo);
     }
 
@@ -49,7 +50,11 @@ public class GameState {
     }
 
     public void updateCurrentRank(String name, String currentRank) {
-        
+        playersInfo.get(name).set(5, currentRank);
+    }
+
+    public void updateCurrentHealth(String name, String currentHealth) {
+        playersInfo.get(name).set(6, currentHealth);
     }
 
     public void updatePlayer(String name, GameState clientGameState) {
