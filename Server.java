@@ -130,8 +130,6 @@ public class Server implements Runnable, ItemListener {
                         clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));
                 socket.close();
                 removeCheckbox(clientName);
-
-                playerStatusEditorPanel.validate();
                 serverGameState.removePlayer(clientName);
             } catch (IOException | ArrayIndexOutOfBoundsException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
@@ -315,5 +313,6 @@ public class Server implements Runnable, ItemListener {
             }
         }
         playerStatusEditorPanel.validate();
+        playerStatusEditorPanel.repaint();
     }
 }
