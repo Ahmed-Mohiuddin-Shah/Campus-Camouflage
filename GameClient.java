@@ -12,6 +12,8 @@ import java.util.ArrayList;
 public class GameClient implements KeyListener, MouseListener, MouseMotionListener, CollisionListener {
     String name;
 
+    GLFont glFont;
+
     Client client;
 
     int deltaX;
@@ -85,6 +87,8 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         ge.registerFont(helloHeadline);
 
+        glFont = new GLFont(helloHeadline);
+
         pauseFrame = new JFrame("Campus Camouflage Paused");
         pauseFrame.setLayout(new GridLayout(1, 2));
         pauseFrame.addKeyListener(this);
@@ -156,12 +160,14 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
         panel4 = new JPanel(new GridLayout(2, 1));
         JButton resumeButton = new JButton("Resume");
+        resumeButton.setFont(helloHeadline);
         resumeButton.addActionListener(e -> {
             device.setFullScreenWindow(gameFrame);
             gameFrame.setSize(device.getFullScreenWindow().getWidth(),
                     device.getFullScreenWindow().getHeight());
         });
         JButton leaveServer = new JButton("Leave");
+        leaveServer.setFont(helloHeadline);
         leaveServer.addActionListener(e -> {
             if (e.getActionCommand().equals("Leave")) {
                 leaveServer.setText("Are you Sure?");
@@ -213,6 +219,8 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
         clientThread = new Thread(client);
         clientThread.start();
 
+        world.getCamera().setEllipsoidMode(Camera.ELLIPSOID_TRANSFORMED);
+
         while (gameLoop) {
             mouseTarget.clearTranslation();
             mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
@@ -227,7 +235,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             // world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, -10f);
 
             // playerHeight = player.getMesh().getBoundingBox()[3] -
-                    // player.getMesh().getBoundingBox()[2];
+            // player.getMesh().getBoundingBox()[2];
 
             // world.getCamera().moveCamera(Camera.CAMERA_MOVEUP, playerHeight / 4);
             world.getCamera().moveCamera(Camera.CAMERA_MOVEOUT, 100f);
@@ -237,6 +245,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             world.renderScene(buffer);
             world.draw(buffer);
             buffer.update();
+            glFont.blitString(buffer, "Status: " + " " + "Health: " + 100, 10, 30, 150, Color.BLACK);
             buffer.display(canvas.getGraphics());
             canvas.repaint();
             try {
@@ -426,7 +435,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
         player.translate(moveRes);
 
         // finally apply the gravity:
-        SimpleVector t = new SimpleVector(0, 1, 0);
+        SimpleVector t = new SimpleVector(0, 3, 0);
         t = player.checkForCollisionEllipsoid(t, ellipsoid, 1);
         player.translate(t);
 
