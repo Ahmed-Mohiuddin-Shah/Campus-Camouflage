@@ -69,9 +69,12 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
     String port;
 
     ArrayList<Object3D> serverPlayersModels;
+    ArrayList<String> serverPlayerPrevModels;
 
     public GameClient(String ip, String port, String name) {
         Config.collideOffset = 500f;
+
+        world = new World();
 
         serverPlayersModels = new ArrayList<>();
 
@@ -210,10 +213,25 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
     }
 
     private void init() {
-        world = new World();
         mouseTarget.build();
         world.addObject(mouseTarget);
         loadMap(Functions.mapName);
+    }
+
+    public void updateServerPlayerModel(Object3D model) {
+        client.gameState.updateCurrentModel(name, mouseWasOn);
+        world.removeObject(player);
+        player.clearTranslation();
+        player = model.cloneObject();
+        playerHeight = player.getMesh().getBoundingBox()[3] -
+                player.getMesh().getBoundingBox()[2];
+        player.translate(0, -playerHeight, 0);
+        player.setCollisionMode(Object3D.COLLISION_CHECK_SELF);
+        player.setCollisionOptimization(true);
+        player.build();
+        world.addObject(player);
+        world.buildAllObjects();
+        reEvaluateEllipsoid();
     }
 
     private void gameLoop() {
@@ -248,12 +266,18 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             client.sendGameState();
 
             // Initialize code
+            world = new World();
+
             serverPlayersModels = new ArrayList<>(client.gameState.getNumOfPlayersOnServer());
+            serverPlayerPrevModels = new ArrayList<>(client.gameState.getNumOfPlayersOnServer());
 
             for (String keyID : client.gameState.playersInfo.keySet()) {
                 ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
                 Object3D assignModel = cop.cloneObject();
                 assignModel.setName(assignModel.getName().split("_jPCT")[0] + "\u00B1" + playerServerInfo.get(0));
+
+                serverPlayerPrevModels.add(assignModel.getName());
+
                 assignModel.clearTranslation();
                 assignModel.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
                 assignModel.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
@@ -272,11 +296,48 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                     if (keyID.equals(name)) {
                         continue;
                     }
+
+                    String playerPrevModel = null;
+
+                    for (String string : serverPlayerPrevModels) {
+                        if (string.contains(keyID)) {
+                            playerPrevModel = string;
+                        }
+                    }
+
                     ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
-                    for (Object3D object3d : serverPlayersModels) {
-                        if (object3d.getName().contains(keyID)) {
-                            object3d.clearTranslation();
-                            object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
+
+                    if (playerPrevModel.contains(playerServerInfo.get(4))) {
+                        for (Object3D object3d : serverPlayersModels) {
+                            if (object3d.getName().contains(keyID)) {
+                                object3d.clearTranslation();
+                                object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
+                            }
+                        }
+                    }
+                    else {
+                        for (Object3D object3d : serverPlayersModels) {
+                            if (object3d.getName().contains(keyID)) {
+                                world.removeObject(object3d);
+                            }
+                        }
+                        for (Object3D assignModel : props) {
+                            if (playerServerInfo.get(4).contains(assignModel.getName())) {
+                                assignModel.setName(
+                                        assignModel.getName().split("_jPCT")[0] + "\u00B1" + playerServerInfo.get(0));
+
+                                serverPlayerPrevModels.add(assignModel.getName());
+
+                                assignModel.clearTranslation();
+                                assignModel.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
+                                assignModel.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
+                                assignModel.setCollisionOptimization(true);
+                                assignModel.build();
+                                world.addObject(assignModel);
+                                serverPlayersModels.add(assignModel);
+                                playerServerInfo.set(4, assignModel.getName());
+                                world.buildAllObjects();
+                            }
                         }
                     }
 
