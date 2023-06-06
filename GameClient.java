@@ -231,8 +231,11 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
         world.getCamera().setEllipsoidMode(Camera.ELLIPSOID_TRANSFORMED);
 
+        String tempString = "nil";
+        Object3D cube = Primitives.getPyramide(20f);
+
         while (!client.serverReady.equals("end")) {
-            
+
             while (client.serverReady.equals("no")) {
                 client.sendGameState();
             }
@@ -241,6 +244,9 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             serverPlayersModels = new ArrayList<>(client.gameState.getNumOfPlayersOnServer());
 
             for (String keyID : client.gameState.playersInfo.keySet()) {
+                if (keyID.equals(name)) {
+                    continue;
+                }
                 ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
                 Object3D assignModel = cop.cloneObject();
                 if (playerServerInfo.get(2).equals("hider")) {
@@ -253,7 +259,7 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                 } else {
                     assignModel = cop.cloneObject();
                 }
-                assignModel.setName(assignModel.getName().split("_jPCT")[0] + "\u00B1"+playerServerInfo.get(0));
+                assignModel.setName(assignModel.getName().split("_jPCT")[0] + "\u00B1" + playerServerInfo.get(0));
                 assignModel.clearTranslation();
                 assignModel.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
                 assignModel.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
@@ -270,20 +276,34 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
             while (client.serverReady.equals("yes")) {
 
-                //While assuming no model change
-                for (Object3D object3d : serverPlayersModels) {
-                    object3d.clearTranslation();
-                    object3d.translate(Functions.stringToSimpleVector(client.gameState.playersInfo.get(object3d.getName().split(
-                            "\u00B1")[1]).get(1)));
+                // While assuming no model change
+                for (String keyID : client.gameState.playersInfo.keySet()) {
+                    if (keyID.equals(name)) {
+                        continue;
+                    }
+                    ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
+                    for (Object3D object3d : serverPlayersModels) {
+                        if (object3d.getName().contains(keyID)) {
+                            object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
+                            tempString = playerServerInfo.get(1);
+                        }
+                        for (Object3D obj : props) {
+                            if (obj.getName().contains("prpvse")) {
+                                obj.clearTranslation();
+                                obj.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
+                            }
+                        }
+                    }
                 }
 
                 mouseTarget.clearTranslation();
                 mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
                 mouseTarget.translate(1, 1, -1);
                 mouseTarget.checkForCollision(world.getCamera().getDirection(), 20f);
+                mouseTarget.checkForCollision(world.getCamera().getDirection(), -20f);
                 moveCamera();
 
-                client.gameState.updatePosition(name, player.getTransformedCenter());
+                client.gameState.updatePosition(name, player.getTranslation());
 
                 world.getCamera().align(player);
                 world.getCamera().setPosition(player.getTransformedCenter());
@@ -303,8 +323,8 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                 try {
                     {
                         glFont.blitString(buffer,
-                                "Status: " + client.serverGameState.playersInfo.get(name).get(2) + " " + "Health: "
-                                        + client.serverGameState.playersInfo.get(name).get(5),
+                                "Status: " + client.serverGameState.playersInfo.get(name).get(2) + "\n" + "Health: "
+                                        + client.serverGameState.playersInfo.get(name).get(5) + "\n" + tempString,
                                 10,
                                 30, 150, Color.BLACK);
                     }
