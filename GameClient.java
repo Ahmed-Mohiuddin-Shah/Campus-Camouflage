@@ -268,7 +268,6 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
             while (client.serverReady.equals("yes")) {
 
-                // While assuming no model change
                 for (String keyID : client.gameState.playersInfo.keySet()) {
                     if (keyID.equals(name)) {
                         continue;
@@ -280,6 +279,8 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                             object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
                         }
                     }
+
+                    
                 }
 
                 mouseTarget.clearTranslation();
