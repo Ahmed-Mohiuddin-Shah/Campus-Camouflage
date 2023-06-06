@@ -297,52 +297,17 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                         continue;
                     }
 
-                    String playerPrevModel = null;
-
-                    for (String string : serverPlayerPrevModels) {
-                        if (string.contains(keyID)) {
-                            playerPrevModel = string;
-                        }
-                    }
-
                     ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
 
-                    if (playerPrevModel.contains(playerServerInfo.get(4))) {
                         for (Object3D object3d : serverPlayersModels) {
                             if (object3d.getName().contains(keyID)) {
                                 object3d.clearTranslation();
                                 object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
                             }
                         }
-                    }
-                    else {
-                        for (Object3D object3d : serverPlayersModels) {
-                            if (object3d.getName().contains(keyID)) {
-                                world.removeObject(object3d);
-                            }
-                        }
-                        for (Object3D assignModel : props) {
-                            if (playerServerInfo.get(4).contains(assignModel.getName())) {
-                                assignModel.setName(
-                                        assignModel.getName().split("_jPCT")[0] + "\u00B1" + playerServerInfo.get(0));
-
-                                serverPlayerPrevModels.add(assignModel.getName());
-
-                                assignModel.clearTranslation();
-                                assignModel.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
-                                assignModel.setCollisionMode(Object3D.COLLISION_CHECK_OTHERS);
-                                assignModel.setCollisionOptimization(true);
-                                assignModel.build();
-                                world.addObject(assignModel);
-                                serverPlayersModels.add(assignModel);
-                                playerServerInfo.set(4, assignModel.getName());
-                                world.buildAllObjects();
-                            }
-                        }
-                    }
-
                     
-                }
+                    
+                    }
 
                 mouseTarget.clearTranslation();
                 mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
