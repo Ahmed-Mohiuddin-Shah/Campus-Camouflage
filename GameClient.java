@@ -240,25 +240,19 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                 client.sendGameState();
             }
 
+            client.gameState.removePlayer(name);
+            client.gameState.addNewPlayer(name, player.getTransformedCenter(), "hider", "non",
+                    player.getName(), "100");
+
+            client.sendGameState();
+            client.sendGameState();
+
             // Initialize code
             serverPlayersModels = new ArrayList<>(client.gameState.getNumOfPlayersOnServer());
 
             for (String keyID : client.gameState.playersInfo.keySet()) {
-                if (keyID.equals(name)) {
-                    continue;
-                }
                 ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
                 Object3D assignModel = cop.cloneObject();
-                if (playerServerInfo.get(2).equals("hider")) {
-                    for (Object3D object3d : props) {
-                        if (object3d.getName().contains(playerServerInfo.get(4))) {
-                            assignModel = object3d.cloneObject();
-                            break;
-                        }
-                    }
-                } else {
-                    assignModel = cop.cloneObject();
-                }
                 assignModel.setName(assignModel.getName().split("_jPCT")[0] + "\u00B1" + playerServerInfo.get(0));
                 assignModel.clearTranslation();
                 assignModel.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
@@ -267,12 +261,10 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                 assignModel.build();
                 world.addObject(assignModel);
                 serverPlayersModels.add(assignModel);
+                playerServerInfo.set(4, assignModel.getName());
             }
 
             init();
-            client.gameState.removePlayer(name);
-            client.gameState.addNewPlayer(name, player.getTransformedCenter(), "hider", "non",
-                    player.getName(), "100");
 
             while (client.serverReady.equals("yes")) {
 
@@ -284,14 +276,8 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
                     ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
                     for (Object3D object3d : serverPlayersModels) {
                         if (object3d.getName().contains(keyID)) {
+                            object3d.clearTranslation();
                             object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
-                            tempString = playerServerInfo.get(1);
-                        }
-                        for (Object3D obj : props) {
-                            if (obj.getName().contains("prpvse")) {
-                                obj.clearTranslation();
-                                obj.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
-                            }
                         }
                     }
                 }
