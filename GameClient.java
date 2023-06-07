@@ -8,7 +8,6 @@ import com.threed.jpct.util.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GameClient implements KeyListener, MouseListener, MouseMotionListener, CollisionListener {
     String name;
@@ -250,7 +249,6 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
         world.getCamera().setEllipsoidMode(Camera.ELLIPSOID_TRANSFORMED);
 
         String tempString = "nil";
-        Object3D cube = Primitives.getPyramide(20f);
 
         while (!client.serverReady.equals("end")) {
 
