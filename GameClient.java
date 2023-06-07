@@ -274,6 +274,8 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
             for (String keyID : client.gameState.playersInfo.keySet()) {
                 ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
                 Object3D assignModel = cop.cloneObject();
+
+                
                 assignModel.setName(assignModel.getName().split("_jPCT")[0] + "\u00B1" + playerServerInfo.get(0));
 
                 serverPlayerPrevModels.add(assignModel.getName());
@@ -299,15 +301,14 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
                     ArrayList<String> playerServerInfo = client.gameState.playersInfo.get(keyID);
 
-                        for (Object3D object3d : serverPlayersModels) {
-                            if (object3d.getName().contains(keyID)) {
-                                object3d.clearTranslation();
-                                object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
-                            }
+                    for (Object3D object3d : serverPlayersModels) {
+                        if (object3d.getName().contains(keyID)) {
+                            object3d.clearTranslation();
+                            object3d.translate(Functions.stringToSimpleVector(playerServerInfo.get(1)));
                         }
-                    
-                    
                     }
+
+                }
 
                 mouseTarget.clearTranslation();
                 mouseTarget.translate(Functions.getMouseWorldPosition(buffer, world, mouseX, mouseY));
@@ -405,15 +406,19 @@ public class GameClient implements KeyListener, MouseListener, MouseMotionListen
 
     public void loadMap(String mapName) {
         ArrayList<Object3D> propArrayList = new ArrayList<>();
-        for (int i = 0; i < Functions.texturesJPG.length; ++i) {
 
-            TextureManager.getInstance().addTexture(Functions.texturesJPG[i] + ".jpg",
-                    new Texture("assets/textures/" + Functions.texturesJPG[i] + ".jpg"));
-        }
+        if (!Functions.loadedOnce) {
+            for (int i = 0; i < Functions.texturesJPG.length; ++i) {
 
-        for (int i = 0; i < Functions.texturesPNG.length; ++i) {
-            TextureManager.getInstance().addTexture(Functions.texturesPNG[i] + ".png",
-                    new Texture("assets/textures/" + Functions.texturesPNG[i] + ".png"));
+                TextureManager.getInstance().addTexture(Functions.texturesJPG[i] + ".jpg",
+                        new Texture("assets/textures/" + Functions.texturesJPG[i] + ".jpg"));
+            }
+
+            for (int i = 0; i < Functions.texturesPNG.length; ++i) {
+                TextureManager.getInstance().addTexture(Functions.texturesPNG[i] + ".png",
+                        new Texture("assets/textures/" + Functions.texturesPNG[i] + ".png"));
+            }
+            Functions.loadedOnce = true;
         }
 
         map = Loader.load3DS("assets/map/" + mapName + ".3ds", 1f);
