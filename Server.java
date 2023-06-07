@@ -119,16 +119,16 @@ public class Server implements Runnable, ItemListener {
                     gameStateString = serverReady + "\u00B1" + gson.toJson(serverGameState);
                     writer.println(gameStateString);
 
-                    if (count > 30) {
-                        addTextServerLog(textArea,
-                                serverGameState.playersInfo.get(clientName).get(2) + ", "
-                                        + serverGameState.playersInfo
-                                                .get(clientName).get(4));
+                    // if (count > 30) {
+                    //     addTextServerLog(textArea,
+                    //             serverGameState.playersInfo.get(clientName).get(2) + ", "
+                    //                     + serverGameState.playersInfo
+                    //                             .get(clientName).get(4));
 
-                        count = 0;
-                    } else {
-                        count++;
-                    }
+                    //     count = 0;
+                    // } else {
+                    //     count++;
+                    // }
                 } while (!recievedString.equals("bye"));
                 addTextServerLog(textArea,
                         clientName + (recievedString.equals("bye") ? " just left!" : " disconnected!"));
